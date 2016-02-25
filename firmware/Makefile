@@ -2,7 +2,7 @@
 TARGET = main
 
 # Path to your arduino installation
-ARDUINOPATH ?= ../../../../..
+ARDUINOPATH ?= ../../../../Code/teensy/arduino-1.6.5/
 
 # configurable options
 OPTIONS = -DF_CPU=96000000 -DUSB_SERIAL -DLAYOUT_US_ENGLISH -DUSING_MAKEFILE
