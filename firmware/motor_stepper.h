@@ -22,6 +22,11 @@
   To disable the velocity profile, just set the ramp_length to zero.
 
 */
+
+
+void motor_stepperISR();
+extern IntervalTimer motor_stepper_timer;
+
 class MotorStepper{
  private:
   uint8_t pin_dir_;   // direction pin
@@ -43,9 +48,15 @@ class MotorStepper{
  public:
   // Set the pins to be used, directory is made HIGH for reverse movement.
   // The step pin is pulsed high for a very short duration (several usec).
-  void begin(uint8_t pin_dir, uint8_t pin_step) {
+  // timer_interval specifies the interval of the timer in microseconds.
+  void begin(uint8_t pin_dir, uint8_t pin_step, uint32_t timer_interval) {
     pin_dir_ = pin_dir;
     pin_step_ = pin_step;
+    pinMode(pin_dir_, OUTPUT);
+    pinMode(pin_step_, OUTPUT);
+
+    // start a intervalTimer for the actual stepping.
+    motor_stepper_timer.begin(motor_stepperISR, timer_interval);
   }
 
   // Set the number of steps to be used as a ramp up towards the max speed.
@@ -74,8 +85,6 @@ class MotorStepper{
   void move(int32_t steps);
 };
 
-void motor_stepperISR();
-extern IntervalTimer motor_stepper_timer;
 extern MotorStepper motor_stepper;
 
 #endif  // FIRMWARE_MOTOR_STEPPER_H_
