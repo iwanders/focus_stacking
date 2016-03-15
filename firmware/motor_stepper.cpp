@@ -23,13 +23,6 @@
 */
 #include "motor_stepper.h"
 
-IntervalTimer motor_stepper_timer;
-MotorStepper motor_stepper;
-
-void motor_stepperISR() {
-  motor_stepper.isr();
-}
-
 void MotorStepper::move(int32_t steps) {
   step_goal_ = (steps < 0) ? -steps : steps;
   direction_ = (steps < 0) ? HIGH : LOW;
@@ -65,17 +58,17 @@ uint32_t MotorStepper::calcDelay(uint32_t step) {
 
 void MotorStepper::isr() {
   if (step_current_ < step_goal_) {
-      // if we are not done
-      if ((last_step_ < wait_before_step_)) {
-        return;  // not time to step yet.
-      }
-      last_step_ = 0;
+    // if we are not done
+    if ((last_step_ < wait_before_step_)) {
+      return;  // not time to step yet.
+    }
+    last_step_ = 0;
 
-      step_current_++;
-      digitalWriteFast(pin_step_, HIGH);  // put step high
-      // step needs to be atleast 1 usec high, calcDelay is long enough.
-      wait_before_step_ = calcDelay(step_current_);
-      digitalWriteFast(pin_step_, LOW);  // put step low.
+    step_current_++;
+    digitalWriteFast(pin_step_, HIGH);  // put step high
+    // step needs to be atleast 1 usec high, calcDelay is long enough.
+    wait_before_step_ = calcDelay(step_current_);
+    digitalWriteFast(pin_step_, LOW);  // put step low.
   }
 }
 
@@ -89,3 +82,10 @@ uint32_t MotorStepper::stepsToGo() {
   return (current_steps < step_goal_) ? (step_goal_ - current_steps) : 0;
 }
 
+#ifdef MOTOR_STEPPER_BACKGROUND_USED
+MotorSteppersBackgroundClass MotorSteppersBackground;
+void motor_steppers_background_ISR() {
+  MotorSteppersBackground.isr();
+}
+
+#endif  // CORE_TEENSY

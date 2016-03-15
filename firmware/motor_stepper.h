@@ -26,6 +26,13 @@
 
 #include "Arduino.h"
 
+// #define USE_MOTOR_STEPPER_BACKGROUND
+
+
+#define MOTOR_STEPPER_BACKGROUND_MOTOR_ARRAY_SIZE 4
+// Length of array of pointers to MotorSteppers in the MotorSteppersBackground
+// object, this determines the maximum number of motors it can move.
+
 /*
   This class is intended for driver IC's / boards which have a direction pin to
   set the direction and a step pin which needs to be latched to move one step.
@@ -47,11 +54,8 @@
 */
 
 
-void motor_stepperISR();
-extern IntervalTimer motor_stepper_timer;
-
 class MotorStepper{
- private:
+ protected:
   uint8_t pin_dir_;   // direction pin
   uint8_t pin_step_;  // step pin
 
@@ -72,14 +76,11 @@ class MotorStepper{
   // Set the pins to be used, directory is made HIGH for reverse movement.
   // The step pin is pulsed high for a very short duration (several usec).
   // timer_interval specifies the interval of the timer in microseconds.
-  void begin(uint8_t pin_dir, uint8_t pin_step, uint32_t timer_interval) {
+  void begin(uint8_t pin_dir, uint8_t pin_step) {
     pin_dir_ = pin_dir;
     pin_step_ = pin_step;
     pinMode(pin_dir_, OUTPUT);
     pinMode(pin_step_, OUTPUT);
-
-    // start a intervalTimer for the actual stepping.
-    motor_stepper_timer.begin(motor_stepperISR, timer_interval);
   }
 
   // Set the number of steps to be used as a ramp up towards the max speed.
@@ -108,6 +109,56 @@ class MotorStepper{
   void move(int32_t steps);
 };
 
-extern MotorStepper motor_stepper;
+
+#if defined(CORE_TEENSY) && defined(USE_MOTOR_STEPPER_BACKGROUND)
+#define MOTOR_STEPPER_BACKGROUND_USED
+  /*
+    Class to automate calling the ISR of various MotorStepper objects, such that
+    the interval timer can be used to perform this act in the background.
+
+    Can deal with multiple motors in one isr.
+
+    If this class is used, one can do:
+
+      motor_stepper.begin(MOTOR_DIRECTION_PIN,
+                          MOTOR_STEPS_PIN);
+
+      motor_stepper.setMinWidth(1000);
+      motor_stepper.setMaxWidth(4000);
+      motor_stepper.setRampLength(100);
+      MotorSteppersBackground.addMotor(&motor_stepper);
+      MotorSteppersBackground.setInterval(500);
+
+    Which automatically calls motor_stepper.isr() every 500 usec.
+  */
+void motor_steppers_background_ISR();  // definition of the global isr function.
+class MotorSteppersBackgroundClass {
+ private:
+    uint32_t isr_interval_;
+    uint8_t motor_count_ = 0;
+    MotorStepper* motors_[MOTOR_STEPPER_BACKGROUND_MOTOR_ARRAY_SIZE];
+    IntervalTimer interval_timer_;
+
+ public:
+    void setInterval(uint32_t isr_interval) {  // sets the interval in usec.
+      isr_interval_ = isr_interval;
+      interval_timer_.end();
+      interval_timer_.begin(motor_steppers_background_ISR, isr_interval_);
+    }
+    void addMotor(MotorStepper* motor) {
+      motors_[motor_count_++] = motor;
+    }
+
+    void isr() {
+      // the global ISR function is called by the intervaltimer, it calls this
+      // method which in turn calls the isr methods of the motors it knows.
+      for (uint8_t i=0; i < motor_count_; i++) {
+        motors_[i]->isr();
+      }
+    }
+};
+// create one instance of the MotorSteppersBackground
+extern MotorSteppersBackgroundClass MotorSteppersBackground;
+#endif
 
 #endif  // FIRMWARE_MOTOR_STEPPER_H_

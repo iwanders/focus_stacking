@@ -28,17 +28,44 @@
 #define MOTOR_STEPS_PIN 16
 #define MOTOR_STEPPER_INTERVAL 200
 
+
+
 void testMotor() {
-  uint32_t togo;
+  MotorStepper motor_stepper;
+
+
+  // begin the stepper with the correct pins
+  motor_stepper.begin(MOTOR_DIRECTION_PIN,
+                      MOTOR_STEPS_PIN);
+
+  // set the widths of pulses and ramp length
+  motor_stepper.setMinWidth(1000);
+  motor_stepper.setMaxWidth(4000);
+  motor_stepper.setRampLength(100);
+
+
+  // if we use the MotorSteppersBackground class to call the motor, add it.
+  #ifdef MOTOR_STEPPER_BACKGROUND_USED
+  MotorSteppersBackground.addMotor(&motor_stepper);
+  MotorSteppersBackground.setInterval(100);
+  #endif
+
+  uint32_t to_go = 0;
   elapsedMillis printTimer = 0;
   int16_t distance = 500;
   while (1) {
-    if (printTimer > 20) {
+    #ifndef MOTOR_STEPPER_BACKGROUND_USED
+    motor_stepper.isr();  // call isr by hand if not using background stepper.
+    #endif
+    if (printTimer > 50) {
       printTimer = 0;
-      togo = motor_stepper.stepsToGo();
-      Serial.print("Togo: ");
-      Serial.println(togo);
-      if (togo == 0) {
+      to_go = motor_stepper.stepsToGo();
+      Serial.print("To go: ");
+      Serial.println(to_go);
+      if (to_go == 0) {
+        #ifdef MOTOR_STEPPER_BACKGROUND_USED
+          Serial.println("Using MotorSteppersBackground to move the motor!");
+        #endif
         delay(1000);
         motor_stepper.move(distance);
         distance = -distance;
@@ -48,18 +75,7 @@ void testMotor() {
 }
 
 
-
 extern "C" int main(void) {
   Serial.begin(9600);
-
-  // begin the stepper with the correct pins
-  motor_stepper.begin(MOTOR_DIRECTION_PIN,
-                      MOTOR_STEPS_PIN,
-                      MOTOR_STEPPER_INTERVAL);
-
-  motor_stepper.setMinWidth(1000);
-  motor_stepper.setMaxWidth(4000);
-  motor_stepper.setRampLength(100);
-
   testMotor();
 }
