@@ -100,7 +100,7 @@ class MotorStepper{
     max_width_ = max_width;
   }
 
-  void isr();
+  void run();
   // routine which sets the direction & step pin if it should.
 
   uint32_t stepsToGo();  // returns the number of steps still to go.
@@ -153,7 +153,7 @@ class MotorSteppersBackgroundClass {
       // the global ISR function is called by the intervaltimer, it calls this
       // method which in turn calls the isr methods of the motors it knows.
       for (uint8_t i=0; i < motor_count_; i++) {
-        motors_[i]->isr();
+        motors_[i]->run();
       }
     }
 };

@@ -56,7 +56,7 @@ uint32_t MotorStepper::calcDelay(uint32_t step) {
   }
 }
 
-void MotorStepper::isr() {
+void MotorStepper::run() {
   if (step_current_ < step_goal_) {
     // if we are not done
     if ((last_step_ < wait_before_step_)) {

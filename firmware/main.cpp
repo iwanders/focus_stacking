@@ -23,10 +23,15 @@
 */
 #include "Arduino.h"
 #include "motor_stepper.h"
+#include "camera_control.h"
 
 #define MOTOR_DIRECTION_PIN 15
 #define MOTOR_STEPS_PIN 16
 #define MOTOR_STEPPER_INTERVAL 200
+
+#define CAMERA_FOCUS_PIN 13
+#define CAMERA_SHUTTER_PIN 14
+
 
 
 
@@ -47,7 +52,7 @@ void testMotor() {
   // if we use the MotorSteppersBackground class to call the motor, add it.
   #ifdef MOTOR_STEPPER_BACKGROUND_USED
   MotorSteppersBackground.addMotor(&motor_stepper);
-  MotorSteppersBackground.setInterval(100);
+  MotorSteppersBackground.setInterval(MOTOR_STEPPER_INTERVAL);
   #endif
 
   uint32_t to_go = 0;
@@ -55,7 +60,7 @@ void testMotor() {
   int16_t distance = 500;
   while (1) {
     #ifndef MOTOR_STEPPER_BACKGROUND_USED
-    motor_stepper.isr();  // call isr by hand if not using background stepper.
+    motor_stepper.run();  // call isr by hand if not using background stepper.
     #endif
     if (printTimer > 50) {
       printTimer = 0;
@@ -75,7 +80,27 @@ void testMotor() {
 }
 
 
+void testCamera() {
+  CameraControl camera_control;
+  camera_control.begin(CAMERA_FOCUS_PIN, CAMERA_SHUTTER_PIN);
+  camera_control.setFocusDuration(1000);
+  camera_control.setShutterDuration(1000);
+  while(1) {
+    
+    Serial.print(millis()); Serial.println(" blocking:");
+    camera_control.photoBlocking();
+    delay(1000);
+    Serial.print(millis()); Serial.println(" nonblocking:");
+    camera_control.startPhoto();
+    while (!camera_control.finishedPhoto()) {
+      delay(100);
+      camera_control.run();
+    }
+  }
+}
+
 extern "C" int main(void) {
   Serial.begin(9600);
-  testMotor();
+  // testMotor();
+  // testCamera();
 }
