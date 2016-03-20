@@ -82,6 +82,10 @@ uint32_t MotorStepper::stepsToGo() {
   return (current_steps < step_goal_) ? (step_goal_ - current_steps) : 0;
 }
 
+void MotorStepper::stop() {
+  step_goal_ = 0;
+}
+
 #ifdef MOTOR_STEPPER_BACKGROUND_USED
 MotorSteppersBackgroundClass MotorSteppersBackground;
 void motor_steppers_background_ISR() {

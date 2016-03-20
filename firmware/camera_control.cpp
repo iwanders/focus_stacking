@@ -23,7 +23,7 @@
 */
 #include "camera_control.h"
 
-void CameraControl::photoBlocking() {
+void CameraOptocoupler::photoBlocking() {
     digitalWrite(focus_pin_, HIGH);
     // Serial.print(millis());
     // Serial.println(" focus_pin_ HIGH");
@@ -40,11 +40,11 @@ void CameraControl::photoBlocking() {
 }
 
 
-void CameraControl::startPhoto() {
+void CameraOptocoupler::startPhoto() {
   duration_ = 0;
 }
 
-void CameraControl::run() {
+void CameraOptocoupler::run() {
   if (duration_ < focus_duration_) {
     // Serial.print(millis());
     // Serial.println(" focus_pin_ HIGH");
@@ -62,6 +62,6 @@ void CameraControl::run() {
   }
 }
 
-bool CameraControl::finishedPhoto(){
+bool CameraOptocoupler::finishedPhoto(){
   return (duration_ > (focus_duration_ + shutter_duration_));
 }

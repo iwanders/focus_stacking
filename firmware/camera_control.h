@@ -26,7 +26,14 @@
 
 #include "Arduino.h"
 
-class CameraControl {
+class CameraControl{
+ public:
+  virtual void startPhoto() = 0;
+  virtual void run() = 0;
+  virtual bool finishedPhoto() = 0;
+};
+
+class CameraOptocoupler: public CameraControl {
   /*
     Class to make a photograph, it first holds the focus pin high, then also
     the trigger pin, then releases both.
@@ -34,10 +41,12 @@ class CameraControl {
  private:
     uint8_t focus_pin_;
     uint8_t shutter_pin_;
+    elapsedMillis duration_;
+
+    // config
     uint32_t focus_duration_;
     uint32_t shutter_duration_;
 
-    elapsedMillis duration_;
 
  public:
     void begin(uint8_t focus_pin, uint8_t shutter_pin) {
@@ -55,7 +64,7 @@ class CameraControl {
       shutter_duration_ = shutter_duration;
     }
 
-    void startPhoto();  // to initialise taking the foto
+    void startPhoto();  // to initialise taking the photo
     void run();         // needs to be called frequently in order to toggle pins
     bool finishedPhoto(); // returns true when the photo is done.
 

@@ -25,6 +25,7 @@
 #define FIRMWARE_MOTOR_STEPPER_H_
 
 #include "Arduino.h"
+#include "motor_control.h"
 
 // #define USE_MOTOR_STEPPER_BACKGROUND
 
@@ -54,7 +55,7 @@
 */
 
 
-class MotorStepper{
+class MotorStepper: public MotorControl{
  protected:
   uint8_t pin_dir_;   // direction pin
   uint8_t pin_step_;  // step pin
@@ -66,6 +67,7 @@ class MotorStepper{
   elapsedMicros last_step_;             // timestamp of last step
 
 
+  // config
   uint32_t min_width_;  // minimum width of a single step pulse in usec.
   uint32_t max_width_;  // maximum width of a single step pulse in usec.
   uint32_t ramp_length_;  // reach maximum speed in this amount of steps.
@@ -107,6 +109,9 @@ class MotorStepper{
 
   // move this number of steps
   void move(int32_t steps);
+
+  // immediately halt movement.
+  void stop();
 };
 
 
