@@ -21,14 +21,17 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-#include "Arduino.h"
-#include "config.h"
-#include "stack_control.h"
-#include "component_test.h"
+#ifndef FIRMWARE_COMPONENT_TEST_H_
+#define FIRMWARE_COMPONENT_TEST_H_
 
-extern "C" int main(void) {
-  Serial.begin(9600);
-  // testMotor();
-  // testCamera();
-  testStacking();
-}
+#include "Arduino.h"
+#include "stack_control.h"
+#include "motor_stepper.h"
+#include "camera_control.h"
+#include "config.h"
+
+void testMotor();
+void testCamera();
+void testStacking();
+
+#endif  // FIRMWARE_COMPONENT_TEST_H_

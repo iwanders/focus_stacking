@@ -21,14 +21,14 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-#include "Arduino.h"
-#include "config.h"
-#include "stack_control.h"
-#include "component_test.h"
+#ifndef FIRMWARE_CONFIG_H_
+#define FIRMWARE_CONFIG_H_
 
-extern "C" int main(void) {
-  Serial.begin(9600);
-  // testMotor();
-  // testCamera();
-  testStacking();
-}
+#define MOTOR_DIRECTION_PIN 15
+#define MOTOR_STEPS_PIN 16
+#define MOTOR_STEPPER_INTERVAL 200
+
+#define CAMERA_FOCUS_PIN 13
+#define CAMERA_SHUTTER_PIN 14
+
+#endif  // FIRMWARE_CONFIG_H_
