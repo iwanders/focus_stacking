@@ -58,7 +58,7 @@ extern "C" int main(void) {
 
   #ifdef MOTOR_STEPPER_BACKGROUND_USED
   MotorSteppersBackground.addMotor(&motor_stepper);
-  MotorSteppersBackground.setInterval(MOTOR_STEPPER_INTERVAL);
+  MotorSteppersBackground.setInterval(MOTOR_STEPPER_BACKGROUND_INTERVAL);
   #endif
 
   // initialise the camera

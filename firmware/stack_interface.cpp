@@ -25,7 +25,6 @@
 
 
 void StackInterface::run() {
-
   // check if we need to send the status
   if (duration_ > status_interval_) {
     duration_ = 0;
@@ -40,14 +39,13 @@ void StackInterface::run() {
       processCommand(reinterpret_cast<msg_t*>(buffer));
     }
   }
-
 }
 
 void StackInterface::sendStatus() {
   // assemble the status update...
 }
 
-void StackInterface::processCommand(const msg_t* msg){
+void StackInterface::processCommand(const msg_t* msg) {
   switch (msg->type) {
     case nop:
       SIDBGln("Got nop.");
@@ -75,7 +73,5 @@ void StackInterface::processCommand(const msg_t* msg){
 
     default:
       SIDBGln("Got unknown command.");
-      
   }
-
 }

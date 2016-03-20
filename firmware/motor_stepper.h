@@ -79,7 +79,6 @@ class MotorStepper: public MotorControl{
   uint32_t calcDelay(uint32_t step);  // calculates the time between the steps
 
  public:
-
   typedef struct {
     uint32_t min_width;
     uint32_t max_width;
@@ -125,7 +124,7 @@ class MotorStepper: public MotorControl{
   // immediately halt movement.
   void stop();
 
-  void setConfig(config_t config){
+  void setConfig(config_t config) {
     setRampLength(config.ramp_length);
     setMaxWidth(config.max_width);
     setMinWidth(config.min_width);

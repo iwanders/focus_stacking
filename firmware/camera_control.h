@@ -50,12 +50,13 @@ class CameraOptocoupler: public CameraControl {
 
 
  public:
-    
+    // config for this object
     typedef struct {
       uint32_t focus_duration;
       uint32_t shutter_duration;
     } config_t;
 
+    // initialises the object with the focus and shutter pins.
     void begin(uint8_t focus_pin, uint8_t shutter_pin) {
       focus_pin_ = focus_pin;
       shutter_pin_ = shutter_pin;
@@ -64,10 +65,14 @@ class CameraOptocoupler: public CameraControl {
       pinMode(shutter_pin_, OUTPUT);
     }
 
+    // Sets the duration to press the focus pin before the shutter is pressed
+    // In milliseconds.
     void setFocusDuration(uint32_t focus_duration) {
       focus_duration_ = focus_duration;
     }
 
+    // Sets the duration the shutter pin is held down after the focus duration.
+    // In milliseconds
     void setShutterDuration(uint32_t shutter_duration) {
       shutter_duration_ = shutter_duration;
     }
@@ -78,11 +83,13 @@ class CameraOptocoupler: public CameraControl {
 
     void photoBlocking();  // performs a photo in blocking manner.
 
-
-    void setConfig(config_t config){
+    // Sets the config based on the provided configuration struct.
+    void setConfig(config_t config) {
       setFocusDuration(config.focus_duration);
       setShutterDuration(config.shutter_duration);
     }
+
+    // Gets the current config.
     config_t getConfig(){
       return {focus_duration_, shutter_duration_};
     }

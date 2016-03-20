@@ -24,27 +24,51 @@
 #ifndef FIRMWARE_CONFIG_H_
 #define FIRMWARE_CONFIG_H_
 
+// direction pin of stepper motor driver board
 #define MOTOR_DIRECTION_PIN 15
+// steps pin of stepper motor driver board.
 #define MOTOR_STEPS_PIN 16
-#define MOTOR_STEPPER_INTERVAL 200
-
-#define MOTOR_DEFAULT_MIN_WIDTH 1000
-#define MOTOR_DEFAULT_MAX_WIDTH 4000
-#define MOTOR_DEFAULT_RAMP_LENGTH 100
 
 // if this is defined the motor stepper is ran in an isr using IntervalTimer.
 #define USE_MOTOR_STEPPER_BACKGROUND
 
+// Interval by which the interval timer is ran, in microseconds.
+#define MOTOR_STEPPER_BACKGROUND_INTERVAL 200
 
+// The MotorStepper speed is expressed as delay between the pulses. It
+// starts at the MAX_WIDTH  and ramps up to MIN_WIDTH which is the fastest the
+// stepper motor will move. Both are in milliseconds.
+
+#define MOTOR_DEFAULT_MIN_WIDTH 1000
+#define MOTOR_DEFAULT_MAX_WIDTH 4000
+
+// The ramp up happens over the following number of steps:
+#define MOTOR_DEFAULT_RAMP_LENGTH 100
+
+
+// Focus pin of the camera, it is high when the focus is 'pressed'.
 #define CAMERA_FOCUS_PIN 13
+
+// shutter pin of the camera, high when 'pressed'.
 #define CAMERA_SHUTTER_PIN 14
 
+// Default parameters, delay & durations are in milliseconds
+
+// Sets the duration to press the focus pin before the shutter is pressed
 #define CAMERA_DEFAULT_FOCUS_DURATION 1000
+// Sets the duration the shutter pin is held down after the focus duration.
 #define CAMERA_DEFAULT_SHUTTER_DURATION 1000
 
+// The delay before the photo in milliseconds
 #define STACK_DEFAULT_DELAY_BEFORE_PHOTO 1000
+
+// The delay after the photo in milliseconds
 #define STACK_DEFAULT_DELAY_AFTER_PHOTO 200
+
+// The direction and amount of steps to move per stack, negative is other way.
 #define STACK_DEFAULT_MOVE_STEPS 200
+
+// The number of stack steps to take (the number of movements and photos)
 #define STACK_DEFAULT_STACK_COUNT 5
 
 #define INTERFACE_DEFAULT_STATUS_INTERVAL 100

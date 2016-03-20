@@ -55,7 +55,6 @@
 
 class StackControl{
  public:
-
   typedef struct {
     uint32_t stack_count;
     uint32_t delay_before_photo;
@@ -122,13 +121,14 @@ class StackControl{
   // This returns true if the stacking is finished.
   bool isStackFinished();
 
-  void setConfig(config_t config){
+  void setConfig(config_t config) {
     setStackCount(config.stack_count);
     setDelayBeforePhoto(config.delay_before_photo);
     setDelayAfterPhoto(config.delay_after_photo);
     setMoveSteps(config.move_steps);
   }
-  config_t getConfig(){
+
+  config_t getConfig() {
     return {stack_count_, delay_before_photo_, delay_after_photo_, move_steps_};
   }
 

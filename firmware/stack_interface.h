@@ -29,6 +29,12 @@
 #include "./camera_control.h"
 #include "./stack_control.h"
 
+/*
+  The StackInterface allows for interaction with a StackControl object.
+
+  It listens to commands from the serial port and processes these.
+*/
+
 
 #define STACK_INTERFACE_DEBUG
 #ifdef STACK_INTERFACE_DEBUG
@@ -41,17 +47,19 @@
 
 class StackInterface{
  public:
-
+  // message types for the messages over the serial port.
   enum msg_type {
     nop = 0,
     set_config = 1,
     get_config = 2
   };
 
+  // config struct for this class.
   typedef struct {
     uint32_t status_interval;
   } config_t;
 
+  // A config message which holds all config structs for all classess.
   typedef struct {
     MotorStepper::config_t motor;
     CameraOptocoupler::config_t camera;
@@ -59,8 +67,9 @@ class StackInterface{
     StackInterface::config_t interface;
   } msg_config_t;
 
+  // A struct which represents a message.
   typedef struct {
-    msg_type type;
+    msg_type type;  // aligned on 4 byte boundary
     union {
       msg_config_t config;
       uint8_t raw[64 - 4];
@@ -77,39 +86,43 @@ class StackInterface{
   void setCamera(CameraOptocoupler* camera) {
     camera_ = camera;
   }
+
   // add the stacker to the Interface.
   void setStacker(StackControl* stacker) {
     stack_ = stacker;
   }
 
+  // set the interval by which we should emit status messages, in milliseconds.
   void setStatusInterval(uint32_t status_interval) {
     status_interval_ = status_interval;
   }
 
-  void run();
-
-
-  void setConfig(config_t config){
+  // Load configuration from a config struct.
+  void setConfig(config_t config) {
     setStatusInterval(config.status_interval);
   }
-  config_t getConfig(){
+  config_t getConfig() {
     return {status_interval_};
   }
 
+  // should be called often to process serial input and the like.
+  void run();
 
  protected:
-
+  // pointers to the relevant objects
   MotorStepper* motor_;
   CameraOptocoupler* camera_;
   StackControl* stack_;
 
 
+  // state
   elapsedMillis duration_;
   uint32_t status_interval_;
 
+  // Emit a status over the serial port
   void sendStatus();
 
-
+  // process a command message.
   void processCommand(const msg_t* msg);
 };
 

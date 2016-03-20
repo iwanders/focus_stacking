@@ -31,6 +31,8 @@
 #include "./stack_interface.h"
 #include "./config.h"
 
+// some simple tests.
+
 void testMotor();
 void testCamera();
 void testStacking();
