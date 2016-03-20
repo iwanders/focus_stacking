@@ -42,6 +42,7 @@ void CameraOptocoupler::photoBlocking() {
 
 void CameraOptocoupler::startPhoto() {
   duration_ = 0;
+  taking_photo_ = true;
 }
 
 void CameraOptocoupler::run() {
@@ -59,9 +60,10 @@ void CameraOptocoupler::run() {
     // Serial.println(" shutter_pin_ LOW");
     digitalWriteFast(focus_pin_, LOW);
     digitalWriteFast(shutter_pin_, LOW);
+    taking_photo_ = false;
   }
 }
 
 bool CameraOptocoupler::finishedPhoto(){
-  return (duration_ > (focus_duration_ + shutter_duration_));
+  return !taking_photo_;
 }

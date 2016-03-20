@@ -39,6 +39,7 @@ class CameraOptocoupler: public CameraControl {
     the trigger pin, then releases both.
   */
  private:
+    bool taking_photo_;
     uint8_t focus_pin_;
     uint8_t shutter_pin_;
     elapsedMillis duration_;
@@ -52,6 +53,7 @@ class CameraOptocoupler: public CameraControl {
     void begin(uint8_t focus_pin, uint8_t shutter_pin) {
       focus_pin_ = focus_pin;
       shutter_pin_ = shutter_pin;
+      taking_photo_ = false;
       pinMode(focus_pin_, OUTPUT);
       pinMode(shutter_pin_, OUTPUT);
     }
