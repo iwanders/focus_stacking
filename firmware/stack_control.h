@@ -29,7 +29,7 @@
 #include "./camera_control.h"
 
 
-#define STACK_CONTROL_DEBUG
+// #define STACK_CONTROL_DEBUG
 #ifdef STACK_CONTROL_DEBUG
   #define SCDBG(a) Serial.print(a);
   #define SCDBGln(a) SCDBG(a); SCDBG(" at: "); Serial.println(micros());
@@ -37,6 +37,7 @@
   #define SCDBG(a)
   #define SCDBGln(a)
 #endif
+
 
 /*
 
@@ -54,6 +55,14 @@
 
 class StackControl{
  public:
+
+  typedef struct {
+    uint32_t stack_count;
+    uint32_t delay_before_photo;
+    uint32_t delay_after_photo;
+    int32_t move_steps;
+  } config_t;
+
   enum sub_state {
       start_delay_before_photo = 0,
       delay_before_photo = 1,
@@ -112,6 +121,16 @@ class StackControl{
 
   // This returns true if the stacking is finished.
   bool isStackFinished();
+
+  void setConfig(config_t config){
+    setStackCount(config.stack_count);
+    setDelayBeforePhoto(config.delay_before_photo);
+    setDelayAfterPhoto(config.delay_after_photo);
+    setMoveSteps(config.move_steps);
+  }
+  config_t getConfig(){
+    return {stack_count_, delay_before_photo_, delay_after_photo_, move_steps_};
+  }
 
  protected:
   MotorControl* motor_;

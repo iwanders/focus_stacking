@@ -28,10 +28,12 @@
 #include "./stack_control.h"
 #include "./motor_stepper.h"
 #include "./camera_control.h"
+#include "./stack_interface.h"
 #include "./config.h"
 
 void testMotor();
 void testCamera();
 void testStacking();
+void testInterface();
 
 #endif  // FIRMWARE_COMPONENT_TEST_H_

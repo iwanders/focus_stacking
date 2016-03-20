@@ -24,11 +24,59 @@
 #include "Arduino.h"
 #include "./config.h"
 #include "./stack_control.h"
+#include "./stack_interface.h"
 #include "./component_test.h"
 
 extern "C" int main(void) {
   Serial.begin(9600);
   // testMotor();
   // testCamera();
-  testStacking();
+  // testStacking();
+  testInterface();
+
+  MotorStepper motor_stepper;
+  StackControl stacker;
+  CameraOptocoupler camera;
+  StackInterface interface;
+
+  // add components to the stacker
+  stacker.setMotor(&motor_stepper);
+  stacker.setCamera(&camera);
+
+  // add all the components to the interface
+  interface.setMotor(&motor_stepper);
+  interface.setCamera(&camera);
+  interface.setStacker(&stacker);
+
+  // begin the stepper with the correct pins
+  motor_stepper.begin(MOTOR_DIRECTION_PIN, MOTOR_STEPS_PIN);
+
+  // set the widths of pulses and ramp length
+  motor_stepper.setMinWidth(MOTOR_DEFAULT_MIN_WIDTH);
+  motor_stepper.setMaxWidth(MOTOR_DEFAULT_MAX_WIDTH);
+  motor_stepper.setRampLength(MOTOR_DEFAULT_RAMP_LENGTH);
+
+  #ifdef MOTOR_STEPPER_BACKGROUND_USED
+  MotorSteppersBackground.addMotor(&motor_stepper);
+  MotorSteppersBackground.setInterval(MOTOR_STEPPER_INTERVAL);
+  #endif
+
+  // initialise the camera
+  camera.begin(CAMERA_FOCUS_PIN, CAMERA_SHUTTER_PIN);
+  camera.setFocusDuration(CAMERA_DEFAULT_FOCUS_DURATION);
+  camera.setShutterDuration(CAMERA_DEFAULT_SHUTTER_DURATION);
+
+
+  stacker.setDelayBeforePhoto(STACK_DEFAULT_DELAY_BEFORE_PHOTO);
+  stacker.setDelayAfterPhoto(STACK_DEFAULT_DELAY_AFTER_PHOTO);
+
+  stacker.setMoveSteps(STACK_DEFAULT_MOVE_STEPS);
+  stacker.setStackCount(STACK_DEFAULT_STACK_COUNT);
+
+  interface.setStatusInterval(INTERFACE_DEFAULT_STATUS_INTERVAL);
+
+  while (true) {
+    stacker.run();
+    interface.run();
+  }
 }

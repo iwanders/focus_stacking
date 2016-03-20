@@ -25,6 +25,7 @@
 #define FIRMWARE_MOTOR_STEPPER_H_
 
 #include "Arduino.h"
+#include "./config.h"
 #include "./motor_control.h"
 
 // #define USE_MOTOR_STEPPER_BACKGROUND
@@ -57,9 +58,11 @@
 
 class MotorStepper: public MotorControl{
  protected:
+  // pins
   uint8_t pin_dir_;   // direction pin
   uint8_t pin_step_;  // step pin
 
+  // state
   uint32_t step_goal_;                  // goal step count
   bool direction_;                      // direction of movement.
   volatile uint32_t step_current_;      // current step count
@@ -72,9 +75,17 @@ class MotorStepper: public MotorControl{
   uint32_t max_width_;  // maximum width of a single step pulse in usec.
   uint32_t ramp_length_;  // reach maximum speed in this amount of steps.
 
+  // internal method
   uint32_t calcDelay(uint32_t step);  // calculates the time between the steps
 
  public:
+
+  typedef struct {
+    uint32_t min_width;
+    uint32_t max_width;
+    uint32_t ramp_length;
+  } config_t;
+
   // Set the pins to be used, directory is made HIGH for reverse movement.
   // The step pin is pulsed high for a very short duration (several usec).
   // timer_interval specifies the interval of the timer in microseconds.
@@ -83,6 +94,7 @@ class MotorStepper: public MotorControl{
     pin_step_ = pin_step;
     pinMode(pin_dir_, OUTPUT);
     pinMode(pin_step_, OUTPUT);
+    step_goal_ = 0;
   }
 
   // Set the number of steps to be used as a ramp up towards the max speed.
@@ -112,6 +124,15 @@ class MotorStepper: public MotorControl{
 
   // immediately halt movement.
   void stop();
+
+  void setConfig(config_t config){
+    setRampLength(config.ramp_length);
+    setMaxWidth(config.max_width);
+    setMinWidth(config.min_width);
+  }
+  config_t getConfig(){
+    return {min_width_, max_width_, ramp_length_};
+  }
 };
 
 

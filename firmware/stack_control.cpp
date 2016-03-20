@@ -97,7 +97,9 @@ void StackControl::run() {
 
     case movement:
       // SCDBG("In ");SCDBGln("movement");
-      motor_->run();
+      #ifndef MOTOR_STEPPER_BACKGROUND_USED
+        motor_->run();
+      #endif
       // if done moving, advance to the next step
       if (motor_->stepsToGo() == 0) {
         sub_state_ = next_step;  // advance the state

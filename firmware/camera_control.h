@@ -50,6 +50,12 @@ class CameraOptocoupler: public CameraControl {
 
 
  public:
+    
+    typedef struct {
+      uint32_t focus_duration;
+      uint32_t shutter_duration;
+    } config_t;
+
     void begin(uint8_t focus_pin, uint8_t shutter_pin) {
       focus_pin_ = focus_pin;
       shutter_pin_ = shutter_pin;
@@ -71,6 +77,15 @@ class CameraOptocoupler: public CameraControl {
     bool finishedPhoto();  // returns true when the photo is done.
 
     void photoBlocking();  // performs a photo in blocking manner.
+
+
+    void setConfig(config_t config){
+      setFocusDuration(config.focus_duration);
+      setShutterDuration(config.shutter_duration);
+    }
+    config_t getConfig(){
+      return {focus_duration_, shutter_duration_};
+    }
 };
 
 #endif  // FIRMWARE_CAMERA_CONTROL_H_

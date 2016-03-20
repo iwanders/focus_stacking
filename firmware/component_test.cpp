@@ -34,9 +34,9 @@ void testMotor() {
                       MOTOR_STEPS_PIN);
 
   // set the widths of pulses and ramp length
-  motor_stepper.setMinWidth(1000);
-  motor_stepper.setMaxWidth(4000);
-  motor_stepper.setRampLength(100);
+  motor_stepper.setMinWidth(MOTOR_DEFAULT_MIN_WIDTH);
+  motor_stepper.setMaxWidth(MOTOR_DEFAULT_MAX_WIDTH);
+  motor_stepper.setRampLength(MOTOR_DEFAULT_RAMP_LENGTH);
 
 
   // if we use the MotorSteppersBackground class to call the motor, add it.
@@ -73,8 +73,8 @@ void testMotor() {
 void testCamera() {
   CameraOptocoupler camera;
   camera.begin(CAMERA_FOCUS_PIN, CAMERA_SHUTTER_PIN);
-  camera.setFocusDuration(1000);
-  camera.setShutterDuration(1000);
+  camera.setFocusDuration(CAMERA_DEFAULT_FOCUS_DURATION);
+  camera.setShutterDuration(CAMERA_DEFAULT_SHUTTER_DURATION);
   while (1) {
     Serial.print(millis()); Serial.println(" blocking:");
     camera.photoBlocking();
@@ -98,10 +98,14 @@ void testStacking() {
                       MOTOR_STEPS_PIN);
 
   // set the widths of pulses and ramp length
-  motor_stepper.setMinWidth(1000);
-  motor_stepper.setMaxWidth(4000);
-  motor_stepper.setRampLength(100);
+  motor_stepper.setMinWidth(MOTOR_DEFAULT_MIN_WIDTH);
+  motor_stepper.setMaxWidth(MOTOR_DEFAULT_MAX_WIDTH);
+  motor_stepper.setRampLength(MOTOR_DEFAULT_RAMP_LENGTH);
 
+  #ifdef MOTOR_STEPPER_BACKGROUND_USED
+  MotorSteppersBackground.addMotor(&motor_stepper);
+  MotorSteppersBackground.setInterval(MOTOR_STEPPER_INTERVAL);
+  #endif
 
   Serial.println("Setup of camera.");
   CameraOptocoupler camera;
@@ -115,11 +119,11 @@ void testStacking() {
   stacker.setMotor(&motor_stepper);
   stacker.setCamera(&camera);
 
-  stacker.setDelayBeforePhoto(0);
-  stacker.setDelayAfterPhoto(0);
+  stacker.setDelayBeforePhoto(STACK_DEFAULT_DELAY_BEFORE_PHOTO);
+  stacker.setDelayAfterPhoto(STACK_DEFAULT_DELAY_AFTER_PHOTO);
 
-  stacker.setMoveSteps(100);
-  stacker.setStackCount(5);
+  stacker.setMoveSteps(STACK_DEFAULT_MOVE_STEPS);
+  stacker.setStackCount(STACK_DEFAULT_STACK_COUNT);
 
 
   Serial.println("Start stacking.");
@@ -129,4 +133,28 @@ void testStacking() {
     stacker.run();
   }
   Serial.println("Done stacking.");
+}
+
+
+void testInterface(){
+  delay(3000);
+  
+  MotorStepper motor_stepper;
+  StackControl stacker;
+  CameraOptocoupler camera;
+  StackInterface interface;
+
+  // add components to the stacker
+  stacker.setMotor(&motor_stepper);
+  stacker.setCamera(&camera);
+
+  // add all the components to the interface
+  interface.setMotor(&motor_stepper);
+  interface.setCamera(&camera);
+  interface.setStacker(&stacker);
+
+  Serial.print("Sizeof msg_t: "); Serial.println(sizeof(StackInterface::msg_t));
+  Serial.print("Sizeof msg_config_t: "); Serial.println(sizeof(StackInterface::msg_config_t));
+  Serial.print("Sizeof msg_type: "); Serial.println(sizeof(StackInterface::msg_type));
+  Serial.println();
 }
