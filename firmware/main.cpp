@@ -24,6 +24,7 @@
 #include "Arduino.h"
 #include "motor_stepper.h"
 #include "camera_control.h"
+#include "stack_control.h"
 
 #define MOTOR_DIRECTION_PIN 15
 #define MOTOR_STEPS_PIN 16
@@ -31,9 +32,6 @@
 
 #define CAMERA_FOCUS_PIN 13
 #define CAMERA_SHUTTER_PIN 14
-
-
-
 
 void testMotor() {
   MotorStepper motor_stepper;
@@ -81,26 +79,71 @@ void testMotor() {
 
 
 void testCamera() {
-  CameraControl camera_control;
-  camera_control.begin(CAMERA_FOCUS_PIN, CAMERA_SHUTTER_PIN);
-  camera_control.setFocusDuration(1000);
-  camera_control.setShutterDuration(1000);
+  CameraOptocoupler camera;
+  camera.begin(CAMERA_FOCUS_PIN, CAMERA_SHUTTER_PIN);
+  camera.setFocusDuration(1000);
+  camera.setShutterDuration(1000);
   while(1) {
     
     Serial.print(millis()); Serial.println(" blocking:");
-    camera_control.photoBlocking();
+    camera.photoBlocking();
     delay(1000);
     Serial.print(millis()); Serial.println(" nonblocking:");
-    camera_control.startPhoto();
-    while (!camera_control.finishedPhoto()) {
+    camera.startPhoto();
+    while (!camera.finishedPhoto()) {
       delay(100);
-      camera_control.run();
+      camera.run();
     }
   }
+}
+
+void testStacking(){
+
+  delay(1000);
+  Serial.println("Setup of motor.");
+  MotorStepper motor_stepper;
+
+  // begin the stepper with the correct pins
+  motor_stepper.begin(MOTOR_DIRECTION_PIN,
+                      MOTOR_STEPS_PIN);
+
+  // set the widths of pulses and ramp length
+  motor_stepper.setMinWidth(1000);
+  motor_stepper.setMaxWidth(4000);
+  motor_stepper.setRampLength(100);
+
+
+  Serial.println("Setup of camera.");
+  CameraOptocoupler camera;
+  camera.begin(CAMERA_FOCUS_PIN, CAMERA_SHUTTER_PIN);
+  camera.setFocusDuration(1000);
+  camera.setShutterDuration(1000);
+
+  Serial.println("Setup of stacker.");
+  StackControl stacker;
+
+  stacker.setMotor(&motor_stepper);
+  stacker.setCamera(&camera);
+
+  stacker.setDelayBeforePhoto(100);
+  stacker.setDelayAfterPhoto(100);
+
+  stacker.setMoveSteps(100);
+  stacker.setStackCount(5);
+
+
+  Serial.println("Start stacking.");
+  delay(1000);
+  stacker.stack();
+  while (!stacker.isStackFinished()) {
+    stacker.run();
+  }
+  Serial.println("Done stacking.");
 }
 
 extern "C" int main(void) {
   Serial.begin(9600);
   // testMotor();
   // testCamera();
+  testStacking();
 }
