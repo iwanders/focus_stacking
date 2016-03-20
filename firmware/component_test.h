@@ -25,10 +25,10 @@
 #define FIRMWARE_COMPONENT_TEST_H_
 
 #include "Arduino.h"
-#include "stack_control.h"
-#include "motor_stepper.h"
-#include "camera_control.h"
-#include "config.h"
+#include "./stack_control.h"
+#include "./motor_stepper.h"
+#include "./camera_control.h"
+#include "./config.h"
 
 void testMotor();
 void testCamera();

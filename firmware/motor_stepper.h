@@ -25,7 +25,7 @@
 #define FIRMWARE_MOTOR_STEPPER_H_
 
 #include "Arduino.h"
-#include "motor_control.h"
+#include "./motor_control.h"
 
 // #define USE_MOTOR_STEPPER_BACKGROUND
 

@@ -22,9 +22,9 @@
   SOFTWARE.
 */
 #include "Arduino.h"
-#include "config.h"
-#include "stack_control.h"
-#include "component_test.h"
+#include "./config.h"
+#include "./stack_control.h"
+#include "./component_test.h"
 
 extern "C" int main(void) {
   Serial.begin(9600);

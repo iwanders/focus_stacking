@@ -25,14 +25,14 @@
 #define FIRMWARE_STACK_CONTROL_H_
 
 #include "Arduino.h"
-#include "motor_control.h"
-#include "camera_control.h"
+#include "./motor_control.h"
+#include "./camera_control.h"
 
 
 #define STACK_CONTROL_DEBUG
 #ifdef STACK_CONTROL_DEBUG
   #define SCDBG(a) Serial.print(a);
-  #define SCDBGln(a) Serial.print(a);Serial.print(" at: "); Serial.println(micros());
+  #define SCDBGln(a) SCDBG(a); SCDBG(" at: "); Serial.println(micros());
 #else
   #define SCDBG(a)
   #define SCDBGln(a)
@@ -127,8 +127,7 @@ class StackControl{
   uint32_t current_step_;  // counter which keeps track of the number of steps
   StackControl::sub_state  sub_state_;  // keeps track of state in this step
   StackControl::state state_;  // sets the global state whether we are stacking.
-  elapsedMillis duration_; // elapsed duration for the delays and such.
-
+  elapsedMillis duration_;  // elapsed duration for the delays and such.
 };
 
 #endif  // FIRMWARE_STACK_CONTROL_H_

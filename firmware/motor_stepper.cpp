@@ -21,7 +21,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-#include "motor_stepper.h"
+#include "./motor_stepper.h"
 
 void MotorStepper::move(int32_t steps) {
   step_goal_ = (steps < 0) ? -steps : steps;

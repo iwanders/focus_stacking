@@ -21,7 +21,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-#include "stack_control.h"
+#include "./stack_control.h"
 
 
 // Start stacking.
@@ -43,7 +43,7 @@ void StackControl::run() {
   // Depending on where we are in the current state, do something:
   switch (sub_state_) {
     case start_delay_before_photo:
-      SCDBG("In ");SCDBGln("start_delay_before_photo");
+      SCDBG("In "); SCDBGln("start_delay_before_photo");
       duration_ = 0;  // next step uses the duration, set it to zero.
       sub_state_ = delay_before_photo;  // advance the state
 
@@ -57,7 +57,7 @@ void StackControl::run() {
 
     case start_photo:
       // start with the photo
-      SCDBG("In ");SCDBGln("start_photo");
+      SCDBG("In "); SCDBGln("start_photo");
       camera_->startPhoto();
       sub_state_ = photo;  // advance the state
 
@@ -67,8 +67,8 @@ void StackControl::run() {
       if (camera_->finishedPhoto()) {
         // if this was the last photo...
         if (current_step_ == stack_count_) {
-          SCDBG("photo done");SCDBGln(" Current step == stack_count ");
-          sub_state_ = next_step; // skip delay and movement.
+          SCDBG("photo done"); SCDBGln(" Current step == stack_count ");
+          sub_state_ = next_step;  // skip delay and movement.
         } else {
           // if done with the photo, advance the state
           sub_state_ = start_delay_after_photo;
@@ -77,7 +77,7 @@ void StackControl::run() {
       break;
 
     case start_delay_after_photo:
-      SCDBG("In ");SCDBGln("start_delay_after_photo");
+      SCDBG("In "); SCDBGln("start_delay_after_photo");
       duration_ = 0;  // next step uses the duration, set it to zero.
       sub_state_ = delay_after_photo;  // advance the state
 
@@ -90,7 +90,7 @@ void StackControl::run() {
       break;
 
     case start_movement:
-      SCDBG("In ");SCDBGln("start_movement");
+      SCDBG("In "); SCDBGln("start_movement");
       // Send the move instruction to the motor.
       motor_->move(move_steps_);
       sub_state_ = movement;
@@ -100,13 +100,13 @@ void StackControl::run() {
       motor_->run();
       // if done moving, advance to the next step
       if (motor_->stepsToGo() == 0) {
-        sub_state_ = next_step; // advance the state
+        sub_state_ = next_step;  // advance the state
       }
       break;
 
     case next_step:
-      SCDBG("In ");SCDBGln("next_step");
-      current_step_++; // increment the current step counter
+      SCDBG("In "); SCDBGln("next_step");
+      current_step_++;  // increment the current step counter
       sub_state_ = start_delay_before_photo;
 
       // if we have performed all the steps, halt.

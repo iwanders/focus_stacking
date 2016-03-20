@@ -21,7 +21,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-#include "camera_control.h"
+#include "./camera_control.h"
 
 void CameraOptocoupler::photoBlocking() {
     digitalWrite(focus_pin_, HIGH);
@@ -64,6 +64,6 @@ void CameraOptocoupler::run() {
   }
 }
 
-bool CameraOptocoupler::finishedPhoto(){
+bool CameraOptocoupler::finishedPhoto() {
   return !taking_photo_;
 }

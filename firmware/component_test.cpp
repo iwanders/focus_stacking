@@ -21,7 +21,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-#include "component_test.h"
+#include "./component_test.h"
 
 
 
@@ -75,8 +75,7 @@ void testCamera() {
   camera.begin(CAMERA_FOCUS_PIN, CAMERA_SHUTTER_PIN);
   camera.setFocusDuration(1000);
   camera.setShutterDuration(1000);
-  while(1) {
-    
+  while (1) {
     Serial.print(millis()); Serial.println(" blocking:");
     camera.photoBlocking();
     delay(1000);
@@ -89,8 +88,7 @@ void testCamera() {
   }
 }
 
-void testStacking(){
-
+void testStacking() {
   delay(1000);
   Serial.println("Setup of motor.");
   MotorStepper motor_stepper;

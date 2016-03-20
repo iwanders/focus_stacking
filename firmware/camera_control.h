@@ -68,9 +68,9 @@ class CameraOptocoupler: public CameraControl {
 
     void startPhoto();  // to initialise taking the photo
     void run();         // needs to be called frequently in order to toggle pins
-    bool finishedPhoto(); // returns true when the photo is done.
+    bool finishedPhoto();  // returns true when the photo is done.
 
-    void photoBlocking(); // performs a photo in blocking manner.
+    void photoBlocking();  // performs a photo in blocking manner.
 };
 
 #endif  // FIRMWARE_CAMERA_CONTROL_H_
