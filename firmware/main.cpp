@@ -125,8 +125,8 @@ void testStacking(){
   stacker.setMotor(&motor_stepper);
   stacker.setCamera(&camera);
 
-  stacker.setDelayBeforePhoto(100);
-  stacker.setDelayAfterPhoto(100);
+  stacker.setDelayBeforePhoto(0);
+  stacker.setDelayAfterPhoto(0);
 
   stacker.setMoveSteps(100);
   stacker.setStackCount(5);

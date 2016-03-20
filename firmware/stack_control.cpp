@@ -65,8 +65,14 @@ void StackControl::run() {
       camera_->run();
       // SCDBG("In ");SCDBGln("photo");
       if (camera_->finishedPhoto()) {
-        // if done with the photo, advance the state
-        sub_state_ = start_delay_after_photo;
+        // if this was the last photo...
+        if (current_step_ == stack_count_) {
+          SCDBG("photo done");SCDBGln(" Current step == stack_count ");
+          sub_state_ = next_step; // skip delay and movement.
+        } else {
+          // if done with the photo, advance the state
+          sub_state_ = start_delay_after_photo;
+        }
       }
       break;
 

@@ -29,10 +29,10 @@
 #include "camera_control.h"
 
 
-// #define STACK_CONTROL_DEBUG
+#define STACK_CONTROL_DEBUG
 #ifdef STACK_CONTROL_DEBUG
   #define SCDBG(a) Serial.print(a);
-  #define SCDBGln(a) Serial.print(a);Serial.print(" at: "); Serial.println(millis());
+  #define SCDBGln(a) Serial.print(a);Serial.print(" at: "); Serial.println(micros());
 #else
   #define SCDBG(a)
   #define SCDBGln(a)
