@@ -36,7 +36,7 @@
 */
 
 
-#define STACK_INTERFACE_DEBUG
+// #define STACK_INTERFACE_DEBUG
 #ifdef STACK_INTERFACE_DEBUG
   #define SIDBG(a) Serial.print(a);
   #define SIDBGln(a) Serial.println(a);
@@ -51,7 +51,8 @@ class StackInterface{
   enum msg_type {
     nop = 0,
     set_config = 1,
-    get_config = 2
+    get_config = 2,
+    start_stack = 3
   };
 
   // config struct for this class.

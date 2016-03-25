@@ -32,7 +32,7 @@ extern "C" int main(void) {
   // testMotor();
   // testCamera();
   // testStacking();
-  testInterface();
+  // testInterface();
 
   MotorStepper motor_stepper;
   StackControl stacker;

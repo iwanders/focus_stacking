@@ -33,7 +33,7 @@ void StackInterface::run() {
 
   // check if we should read the serial port
   if (Serial.available()) {
-    char buffer[sizeof(msg_t)];
+    char buffer[sizeof(msg_t)] = {0};
     if (Serial.readBytes(buffer, sizeof(msg_t)) == sizeof(msg_t)) {
       // we have a command, process it.
       processCommand(reinterpret_cast<msg_t*>(buffer));
@@ -61,14 +61,20 @@ void StackInterface::processCommand(const msg_t* msg) {
 
     case get_config: {
         SIDBGln("Got get_config.");
-        char buffer[sizeof(msg_t)];
-        msg_t* msg = reinterpret_cast<msg_t*>(buffer);
-        msg->config.motor = motor_->getConfig();
-        msg->config.camera = camera_->getConfig();
-        msg->config.stack = stack_->getConfig();
-        msg->config.interface = this->getConfig();
-        Serial.write(buffer);
+        char buffer[sizeof(msg_t)] = {0};
+        msg_t* response = reinterpret_cast<msg_t*>(buffer);
+        response->type = get_config;
+        response->config.motor = motor_->getConfig();
+        response->config.camera = camera_->getConfig();
+        response->config.stack = stack_->getConfig();
+        response->config.interface = this->getConfig();
+        SIDBGln(response->config.motor.min_width);
+        Serial.write(buffer, sizeof(msg_t));
       }
+      break;
+
+    case start_stack: 
+        stack_->stack();
       break;
 
     default:
