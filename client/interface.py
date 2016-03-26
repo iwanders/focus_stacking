@@ -6,6 +6,7 @@ import logging
 import threading
 import time
 import queue
+import json
 
 import message
 
@@ -17,7 +18,7 @@ class StackInterface(threading.Thread):
         self.running = False
 
         self.packet_size = packet_size
-        
+
         self.rx = queue.Queue()
         self.tx = queue.Queue()
 
@@ -36,13 +37,14 @@ class StackInterface(threading.Thread):
 
     def stop(self):
         self.running = False
+        time.sleep(0.001)
         if (self.ser):
             self.ser.close()
 
     def run(self):
         self.running = True
         while (self.running):
-            if (self.ser == None):
+            if (self.ser is None):
                 self.stop()
 
             # try to read message from serial port
@@ -51,7 +53,7 @@ class StackInterface(threading.Thread):
                     buffer = bytearray(64)
                     d = self.ser.readinto(buffer)
 
-                    # if we got the correct number of bytes put it in the queue.
+                    # Did we get the correct number of bytes? If so queue it.
                     if (d == self.packet_size):
                         msg = message.Msg.read(buffer)
                         self.rx.put_nowait(msg)
@@ -65,7 +67,7 @@ class StackInterface(threading.Thread):
                 msg = self.tx.get_nowait()
                 self.ser.write(bytes(msg))
             except queue.Empty:
-                pass # there was no data there.
+                pass  # there was no data there.
             except serial.SerialException:
                 self.stop()
 
@@ -91,26 +93,32 @@ class StackInterface(threading.Thread):
                     # print(m)
                     break
             except KeyboardInterrupt:
-                break;
+                break
         return m
-        
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Interact with focus stacking")
+    parser = argparse.ArgumentParser(description="Control Focus Stacking.")
     parser.add_argument('--port', '-p', help="The serial port to connect to.",
-                        default="/dev/ttyACM0")  
+                        default="/dev/ttyACM0")
 
     subparsers = parser.add_subparsers(dest="command")
 
     for i in range(0, len(message.msg_type_lookup)):
         command = message.msg_type_lookup[i]
         command_parser = subparsers.add_parser(command)
-
+        if (command.startswith("set_")):
+            fieldname = message.msg_type_field[i]
+            tmp = message.Msg()
+            tmp.msg_type = i
+            config = str(getattr(tmp, fieldname)).replace("'", '"')
+            helpstr = "Json representing configuration {}".format(config)
+            command_parser.add_argument('config', help=helpstr)
 
     args = parser.parse_args()
 
     # no command
-    if (args.command == None):
+    if (args.command is None):
         parser.print_help()
         parser.exit()
 
@@ -129,3 +137,20 @@ if __name__ == "__main__":
         a.stop()
         a.join()
 
+    if (args.command.startswith("set_")):
+        command_id = getattr(message.msg_type, args.command)
+        fieldname = message.msg_type_field[command_id]
+        msg = message.Msg()
+        msg.msg_type = getattr(msg.type, args.command)
+        d = {fieldname: json.loads(args.config)}
+        msg.from_dict(d)
+        print("Sending {}".format(msg))
+
+        a = StackInterface()
+        a.connect(args.port)
+        a.start()
+
+        a.put_message(msg)
+
+        a.stop()
+        a.join()

@@ -28,7 +28,7 @@ class readable():
 
 
 # Mixin to allow conversion of a ctypes structure to and from a dictionary.
-class isdict():
+class dictionary():
     def __iter__(self):
         for k, t in self._fields_:
             if (issubclass(t, ctypes.Structure)):
@@ -51,30 +51,30 @@ class isdict():
 
 
 # Structs for the various parts in the stacking firmware.
-class ConfigMotorStepper(ctypes.LittleEndianStructure, isdict):
+class ConfigMotorStepper(ctypes.LittleEndianStructure, dictionary):
     _fields_ = [("min_width", ctypes.c_uint),
                 ("max_width", ctypes.c_uint),
                 ("ramp_length", ctypes.c_uint)]
 
 
-class ConfigCameraOptocoupler(ctypes.LittleEndianStructure, isdict):
+class ConfigCameraOptocoupler(ctypes.LittleEndianStructure, dictionary):
     _fields_ = [("focus_duration", ctypes.c_uint),
                 ("shutter_duration", ctypes.c_uint)]
 
 
-class ConfigStackControl(ctypes.LittleEndianStructure, isdict):
+class ConfigStackControl(ctypes.LittleEndianStructure, dictionary):
     _fields_ = [("stack_count", ctypes.c_uint),
                 ("delay_before_photo", ctypes.c_uint),
                 ("delay_after_photo", ctypes.c_uint),
                 ("move_steps", ctypes.c_int)]
 
 
-class ConfigStackInterface(ctypes.LittleEndianStructure, isdict):
+class ConfigStackInterface(ctypes.LittleEndianStructure, dictionary):
     _fields_ = [("status_interval", ctypes.c_uint)]
 
 
 # A message config consists of this:
-class MsgConfig(ctypes.LittleEndianStructure, isdict):
+class MsgConfig(ctypes.LittleEndianStructure, dictionary):
     _fields_ = [("motor", ConfigMotorStepper),
                 ("camera", ConfigCameraOptocoupler),
                 ("stack", ConfigStackControl),
@@ -169,7 +169,7 @@ if __name__ == "__main__":
         print("A: {}".format(str(a)))
         a_dict = dict(a)
         print("A dict: {}".format(str(a_dict)))
-        #print(a_dict)
+        # print(a_dict)
         b = Msg()
         b.from_dict(a_dict)
         print("b: {}".format(str(b)))
