@@ -52,7 +52,8 @@ class StackInterface{
     nop = 0,
     set_config = 1,
     get_config = 2,
-    start_stack = 3
+    start_stack = 3,
+    action_motor = 4,
   };
 
   // config struct for this class.
@@ -68,11 +69,16 @@ class StackInterface{
     StackInterface::config_t interface;
   } msg_config_t;
 
+  typedef struct {
+    int32_t steps;
+  } msg_action_motor_t;
+
   // A struct which represents a message.
   typedef struct {
     msg_type type;  // aligned on 4 byte boundary
     union {
       msg_config_t config;
+      msg_action_motor_t action_motor;
       uint8_t raw[64 - 4];
     };
   } msg_t;
@@ -119,6 +125,8 @@ class StackInterface{
   // state
   elapsedMillis duration_;
   uint32_t status_interval_;
+
+  bool moving_motor_ = false;
 
   // Emit a status over the serial port
   void sendStatus();

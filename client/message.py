@@ -5,13 +5,15 @@ from collections import namedtuple
 msg_type_t = namedtuple("msg_type", ["nop",
                                      "set_config",
                                      "get_config",
-                                     "stack"])
+                                     "start_stack",
+                                     "action_motor"])
 msg_type = msg_type_t(*range(0, len(msg_type_t._fields)))
 # can do msg_type.nop now.
 
 # Depending on the message type, we interpret the payload as to be this field:
 msg_type_field = {msg_type_t._fields.index("set_config"): "config",
-                  msg_type_t._fields.index("get_config"): "config"}
+                  msg_type_t._fields.index("get_config"): "config",
+                  msg_type_t._fields.index("action_motor"): "action_motor"}
 
 # Reverse lookup for msg type, that is id->name
 msg_type_lookup = dict((v, k) for v, k in list(enumerate(msg_type_t._fields)))
@@ -81,8 +83,14 @@ class MsgConfig(ctypes.LittleEndianStructure, dictionary):
                 ("interface", ConfigStackInterface)]
 
 
+class ActionMotor(ctypes.LittleEndianStructure, dictionary):
+    _fields_ = [("steps", ctypes.c_int)]
+
+
 class _MsgBody(ctypes.Union):
-    _fields_ = [("config", MsgConfig), ("raw", ctypes.c_byte * (64-4))]
+    _fields_ = [("config", MsgConfig),
+                ("action_motor", ActionMotor),
+                ("raw", ctypes.c_byte * (64-4))]
 
 
 class Msg(ctypes.LittleEndianStructure, readable):

@@ -33,14 +33,14 @@
 #define USE_MOTOR_STEPPER_BACKGROUND
 
 // Interval by which the interval timer is ran, in microseconds.
-#define MOTOR_STEPPER_BACKGROUND_INTERVAL 200
+#define MOTOR_STEPPER_BACKGROUND_INTERVAL 100
 
 // The MotorStepper speed is expressed as delay between the pulses. It
 // starts at the MAX_WIDTH  and ramps up to MIN_WIDTH which is the fastest the
 // stepper motor will move. Both are in milliseconds.
 
 #define MOTOR_DEFAULT_MIN_WIDTH 1000
-#define MOTOR_DEFAULT_MAX_WIDTH 4000
+#define MOTOR_DEFAULT_MAX_WIDTH 3000
 
 // The ramp up happens over the following number of steps:
 #define MOTOR_DEFAULT_RAMP_LENGTH 100

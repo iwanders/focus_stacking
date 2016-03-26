@@ -122,3 +122,7 @@ void StackControl::run() {
 bool StackControl::isStackFinished() {
   return (current_step_ > stack_count_) && (state_ == halted);
 }
+
+bool StackControl::isStacking() {
+  return (state_ == running);
+}

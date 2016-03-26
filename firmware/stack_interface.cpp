@@ -39,6 +39,15 @@ void StackInterface::run() {
       processCommand(reinterpret_cast<msg_t*>(buffer));
     }
   }
+
+  if (moving_motor_) {
+    #ifndef MOTOR_STEPPER_BACKGROUND_USED
+      motor_->run();
+    #endif
+    if (motor_->stepsToGo() == 0) {
+      moving_motor_ = false;
+    }
+  }
 }
 
 void StackInterface::sendStatus() {
@@ -73,7 +82,16 @@ void StackInterface::processCommand(const msg_t* msg) {
       }
       break;
 
-    case start_stack: 
+    case action_motor:
+        // move the motor if it is not moving already and we are not stacking.
+        if ((!stack_->isStacking())) {
+          moving_motor_ = true;
+          motor_->move(msg->action_motor.steps);
+        }
+      break;
+
+    case start_stack:
+        moving_motor_ = false;
         stack_->stack();
       break;
 

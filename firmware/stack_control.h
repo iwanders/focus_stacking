@@ -121,6 +121,8 @@ class StackControl{
   // This returns true if the stacking is finished.
   bool isStackFinished();
 
+  bool isStacking();
+
   void setConfig(config_t config) {
     setStackCount(config.stack_count);
     setDelayBeforePhoto(config.delay_before_photo);
@@ -145,7 +147,7 @@ class StackControl{
   // operation
   uint32_t current_step_;  // counter which keeps track of the number of steps
   StackControl::sub_state  sub_state_;  // keeps track of state in this step
-  StackControl::state state_;  // sets the global state whether we are stacking.
+  StackControl::state state_ = halted;  // whether we are stacking or halted.
   elapsedMillis duration_;  // elapsed duration for the delays and such.
 };
 

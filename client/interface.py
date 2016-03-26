@@ -107,7 +107,7 @@ if __name__ == "__main__":
     for i in range(0, len(message.msg_type_lookup)):
         command = message.msg_type_lookup[i]
         command_parser = subparsers.add_parser(command)
-        if (command.startswith("set_")):
+        if (command.startswith("set_") or command.startswith("action_")):
             fieldname = message.msg_type_field[i]
             tmp = message.Msg()
             tmp.msg_type = i
@@ -137,7 +137,7 @@ if __name__ == "__main__":
         a.stop()
         a.join()
 
-    if (args.command.startswith("set_")):
+    if (args.command.startswith("set_") or command.startswith("action_")):
         command_id = getattr(message.msg_type, args.command)
         fieldname = message.msg_type_field[command_id]
         msg = message.Msg()
@@ -151,6 +151,8 @@ if __name__ == "__main__":
         a.start()
 
         a.put_message(msg)
+        while(not a.tx.empty()):
+            time.sleep(0.01)
 
         a.stop()
         a.join()
