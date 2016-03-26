@@ -32,11 +32,16 @@ void StackControl::stack() {
   state_ = running;  // start stacking.
 }
 
+void StackControl::move(int32_t steps) {
+  sub_state_ = start_movement;
+  this->setMoveSteps(steps);
+  state_ = should_pause;
+}
 
 
 void StackControl::run() {
   // If we are not running, return.
-  if (state_ != running) {
+  if (state_ == halted) {
     return;
   }
 
@@ -76,6 +81,11 @@ void StackControl::run() {
       }
       break;
 
+    case pause_after_photo:
+      if (state_ == should_pause) {
+        break;
+      }
+
     case start_delay_after_photo:
       SCDBG("In "); SCDBGln("start_delay_after_photo");
       duration_ = 0;  // next step uses the duration, set it to zero.
@@ -106,6 +116,11 @@ void StackControl::run() {
       }
       break;
 
+    case pause_after_movement:
+      if (state_ == should_pause) {
+        break;
+      }
+
     case next_step:
       SCDBG("In "); SCDBGln("next_step");
       current_step_++;  // increment the current step counter
@@ -123,6 +138,6 @@ bool StackControl::isStackFinished() {
   return (current_step_ > stack_count_) && (state_ == halted);
 }
 
-bool StackControl::isStacking() {
-  return (state_ == running);
+bool StackControl::isIdle() {
+  return (state_ == halted) or ((state_ == should_pause) and ((state_ == pause_after_movement) or (state_ == pause_after_photo)));
 }

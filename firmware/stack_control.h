@@ -67,16 +67,19 @@ class StackControl{
       delay_before_photo = 1,
       start_photo = 2,
       photo = 3,
-      start_delay_after_photo = 4,
-      delay_after_photo = 5,
-      start_movement = 6,
-      movement = 7,
-      next_step = 8
+      pause_after_photo = 4,
+      start_delay_after_photo = 5,
+      delay_after_photo = 6,
+      start_movement = 7,
+      movement = 8,
+      pause_after_movement = 9,
+      next_step = 10
     };
 
   enum state {
       halted = 0,
-      running = 1
+      should_pause = 1,
+      running = 2
     };
 
 
@@ -121,7 +124,8 @@ class StackControl{
   // This returns true if the stacking is finished.
   bool isStackFinished();
 
-  bool isStacking();
+  bool isIdle();
+
 
   void setConfig(config_t config) {
     setStackCount(config.stack_count);
@@ -133,6 +137,8 @@ class StackControl{
   config_t getConfig() {
     return {stack_count_, delay_before_photo_, delay_after_photo_, move_steps_};
   }
+
+  void move(int32_t steps);
 
  protected:
   MotorControl* motor_;

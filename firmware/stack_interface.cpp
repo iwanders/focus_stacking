@@ -40,19 +40,24 @@ void StackInterface::run() {
     }
   }
 
-  if (moving_motor_) {
-    #ifndef MOTOR_STEPPER_BACKGROUND_USED
-      motor_->run();
-    #endif
-    if (motor_->stepsToGo() == 0) {
-      moving_motor_ = false;
-    }
-  }
 }
 
 void StackInterface::sendStatus() {
   // assemble the status update...
 }
+
+void StackInterface::getConfigs(){
+  config_motor_ = motor_->getConfig();
+  config_camera_ = camera_->getConfig();
+  config_stack_ = stack_->getConfig();
+}
+
+void StackInterface::setConfigs(){
+  motor_->setConfig(config_motor_);
+  camera_->setConfig(config_camera_);
+  stack_->setConfig(config_stack_);
+}
+
 
 void StackInterface::processCommand(const msg_t* msg) {
   switch (msg->type) {
@@ -62,9 +67,11 @@ void StackInterface::processCommand(const msg_t* msg) {
 
     case set_config:
       SIDBGln("Got set_config.");
-      motor_->setConfig(msg->config.motor);
-      camera_->setConfig(msg->config.camera);
-      stack_->setConfig(msg->config.stack);
+
+      config_motor_ = msg->config.motor;
+      config_camera_ = msg->config.camera;
+      config_stack_ = msg->config.stack;
+
       this->setConfig(msg->config.interface);
       break;
 
@@ -73,9 +80,10 @@ void StackInterface::processCommand(const msg_t* msg) {
         char buffer[sizeof(msg_t)] = {0};
         msg_t* response = reinterpret_cast<msg_t*>(buffer);
         response->type = get_config;
-        response->config.motor = motor_->getConfig();
-        response->config.camera = camera_->getConfig();
-        response->config.stack = stack_->getConfig();
+        getConfigs();
+        response->config.motor = config_motor_;
+        response->config.camera = config_camera_;
+        response->config.stack = config_stack_;
         response->config.interface = this->getConfig();
         SIDBGln(response->config.motor.min_width);
         Serial.write(buffer, sizeof(msg_t));
@@ -84,14 +92,13 @@ void StackInterface::processCommand(const msg_t* msg) {
 
     case action_motor:
         // move the motor if it is not moving already and we are not stacking.
-        if ((!stack_->isStacking())) {
-          moving_motor_ = true;
-          motor_->move(msg->action_motor.steps);
+        if ((stack_->isIdle())) {
+          stack_->move(msg->action_motor.steps);
         }
       break;
 
     case start_stack:
-        moving_motor_ = false;
+        setConfigs();
         stack_->stack();
       break;
 

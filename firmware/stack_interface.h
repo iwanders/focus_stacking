@@ -115,24 +115,35 @@ class StackInterface{
   // should be called often to process serial input and the like.
   void run();
 
+  void getInitialConfigs() {
+    getConfigs();
+  }
+
+
  protected:
   // pointers to the relevant objects
   MotorStepper* motor_;
   CameraOptocoupler* camera_;
   StackControl* stack_;
 
+  MotorStepper::config_t config_motor_;
+  CameraOptocoupler::config_t config_camera_;
+  StackControl::config_t config_stack_;
 
   // state
   elapsedMillis duration_;
   uint32_t status_interval_;
-
-  bool moving_motor_ = false;
 
   // Emit a status over the serial port
   void sendStatus();
 
   // process a command message.
   void processCommand(const msg_t* msg);
+
+
+  void getConfigs();
+  void setConfigs();
+
 };
 
 

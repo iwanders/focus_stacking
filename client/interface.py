@@ -7,6 +7,7 @@ import threading
 import time
 import queue
 import json
+import sys
 
 import message
 
@@ -121,6 +122,7 @@ if __name__ == "__main__":
     if (args.command is None):
         parser.print_help()
         parser.exit()
+        sys.exit(1)
 
     # we are retrieving something.
     if (args.command.startswith("get_")):
@@ -136,14 +138,16 @@ if __name__ == "__main__":
         print(m)
         a.stop()
         a.join()
+        sys.exit(0)
 
     if (args.command.startswith("set_") or command.startswith("action_")):
         command_id = getattr(message.msg_type, args.command)
-        fieldname = message.msg_type_field[command_id]
         msg = message.Msg()
         msg.msg_type = getattr(msg.type, args.command)
-        d = {fieldname: json.loads(args.config)}
-        msg.from_dict(d)
+        if (command_id in message.msg_type_field):
+            fieldname = message.msg_type_field[command_id]
+            d = {fieldname: json.loads(args.config)}
+            msg.from_dict(d)
         print("Sending {}".format(msg))
 
         a = StackInterface()
@@ -156,3 +160,4 @@ if __name__ == "__main__":
 
         a.stop()
         a.join()
+        sys.exit(0)

@@ -75,6 +75,7 @@ extern "C" int main(void) {
 
   interface.setStatusInterval(INTERFACE_DEFAULT_STATUS_INTERVAL);
 
+  interface.getInitialConfigs();
   while (true) {
     stacker.run();
     interface.run();
