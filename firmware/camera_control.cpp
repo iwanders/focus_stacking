@@ -67,3 +67,11 @@ void CameraOptocoupler::run() {
 bool CameraOptocoupler::finishedPhoto() {
   return !taking_photo_;
 }
+
+
+void CameraOptocoupler::stop() {
+  taking_photo_ = false;
+  duration_ = 0;
+  digitalWriteFast(focus_pin_, LOW);
+  digitalWriteFast(shutter_pin_, LOW);
+}

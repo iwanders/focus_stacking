@@ -109,12 +109,13 @@ if __name__ == "__main__":
         command = message.msg_type_lookup[i]
         command_parser = subparsers.add_parser(command)
         if (command.startswith("set_") or command.startswith("action_")):
-            fieldname = message.msg_type_field[i]
-            tmp = message.Msg()
-            tmp.msg_type = i
-            config = str(getattr(tmp, fieldname)).replace("'", '"')
-            helpstr = "Json representing configuration {}".format(config)
-            command_parser.add_argument('config', help=helpstr)
+            if (i in message.msg_type_field):
+                fieldname = message.msg_type_field[i]
+                tmp = message.Msg()
+                tmp.msg_type = i
+                config = str(getattr(tmp, fieldname)).replace("'", '"')
+                helpstr = "Json representing configuration {}".format(config)
+                command_parser.add_argument('config', help=helpstr)
 
     args = parser.parse_args()
 

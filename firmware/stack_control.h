@@ -66,7 +66,7 @@ class StackControl{
       start_delay_before_photo = 0,
       delay_before_photo = 1,
       start_photo = 2,
-      photo = 3,
+      photo_busy = 3,
       pause_after_photo = 4,
       start_delay_after_photo = 5,
       delay_after_photo = 6,
@@ -117,9 +117,14 @@ class StackControl{
   // Starts the stack procedure with the current settings.
   void stack();
 
+  void photo();
+
   // This method should be called often, it manages the state machine and calls
   // the motor and camera run methods.
   void run();
+
+  // Stop the stacking and motor movement.
+  void stop();
 
   // This returns true if the stacking is finished.
   bool isStackFinished();

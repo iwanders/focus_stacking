@@ -54,6 +54,8 @@ class StackInterface{
     get_config = 2,
     start_stack = 3,
     action_motor = 4,
+    action_camera = 5,
+    action_stop = 6,
   };
 
   // config struct for this class.
@@ -115,10 +117,8 @@ class StackInterface{
   // should be called often to process serial input and the like.
   void run();
 
-  void getInitialConfigs() {
-    getConfigs();
-  }
-
+  // sets the stored configs in the StackInterface to those of the components.
+  void retrieveConfigs();
 
  protected:
   // pointers to the relevant objects
@@ -126,6 +126,7 @@ class StackInterface{
   CameraOptocoupler* camera_;
   StackControl* stack_;
 
+  // store the stack configuration of the various components.
   MotorStepper::config_t config_motor_;
   CameraOptocoupler::config_t config_camera_;
   StackControl::config_t config_stack_;
@@ -141,9 +142,7 @@ class StackInterface{
   void processCommand(const msg_t* msg);
 
 
-  void getConfigs();
   void setConfigs();
-
 };
 
 

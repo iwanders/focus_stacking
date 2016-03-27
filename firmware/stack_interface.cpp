@@ -39,20 +39,19 @@ void StackInterface::run() {
       processCommand(reinterpret_cast<msg_t*>(buffer));
     }
   }
-
 }
 
 void StackInterface::sendStatus() {
   // assemble the status update...
 }
 
-void StackInterface::getConfigs(){
+void StackInterface::retrieveConfigs() {
   config_motor_ = motor_->getConfig();
   config_camera_ = camera_->getConfig();
   config_stack_ = stack_->getConfig();
 }
 
-void StackInterface::setConfigs(){
+void StackInterface::setConfigs() {
   motor_->setConfig(config_motor_);
   camera_->setConfig(config_camera_);
   stack_->setConfig(config_stack_);
@@ -80,7 +79,7 @@ void StackInterface::processCommand(const msg_t* msg) {
         char buffer[sizeof(msg_t)] = {0};
         msg_t* response = reinterpret_cast<msg_t*>(buffer);
         response->type = get_config;
-        getConfigs();
+        retrieveConfigs();
         response->config.motor = config_motor_;
         response->config.camera = config_camera_;
         response->config.stack = config_stack_;
@@ -99,7 +98,19 @@ void StackInterface::processCommand(const msg_t* msg) {
 
     case start_stack:
         setConfigs();
-        stack_->stack();
+        if ((stack_->isIdle())) {
+          stack_->stack();
+        }
+      break;
+
+    case action_camera:
+        if ((stack_->isIdle())) {
+          stack_->photo();
+        }
+      break;
+
+    case action_stop:
+        stack_->stop();
       break;
 
     default:

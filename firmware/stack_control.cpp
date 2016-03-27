@@ -32,10 +32,24 @@ void StackControl::stack() {
   state_ = running;  // start stacking.
 }
 
+// takes a picture.
+void StackControl::photo() {
+  current_step_ = 0;  // reset current step counter
+  duration_ = 0;
+  sub_state_ = start_photo;  // ensure that we start with a delay and photo
+  state_ = should_pause;  // start stacking.
+}
+
 void StackControl::move(int32_t steps) {
   sub_state_ = start_movement;
   this->setMoveSteps(steps);
   state_ = should_pause;
+}
+
+void StackControl::stop() {
+  state_ = halted;
+  motor_->stop();
+  camera_->stop();
 }
 
 
@@ -64,9 +78,9 @@ void StackControl::run() {
       // start with the photo
       SCDBG("In "); SCDBGln("start_photo");
       camera_->startPhoto();
-      sub_state_ = photo;  // advance the state
+      sub_state_ = photo_busy;  // advance the state
 
-    case photo:
+    case photo_busy:
       camera_->run();
       // SCDBG("In ");SCDBGln("photo");
       if (camera_->finishedPhoto()) {
@@ -76,7 +90,7 @@ void StackControl::run() {
           sub_state_ = next_step;  // skip delay and movement.
         } else {
           // if done with the photo, advance the state
-          sub_state_ = start_delay_after_photo;
+          sub_state_ = pause_after_photo;
         }
       }
       break;
@@ -139,5 +153,7 @@ bool StackControl::isStackFinished() {
 }
 
 bool StackControl::isIdle() {
-  return (state_ == halted) or ((state_ == should_pause) and ((state_ == pause_after_movement) or (state_ == pause_after_photo)));
+  return (state_ == halted) ||
+         ((state_ == should_pause) && ((sub_state_ == pause_after_movement) ||
+                                       (sub_state_ == pause_after_photo)));
 }

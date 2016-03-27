@@ -30,6 +30,7 @@ class CameraControl{
  public:
   virtual void startPhoto() = 0;
   virtual void run() = 0;
+  virtual void stop() = 0;
   virtual bool finishedPhoto() = 0;
 };
 
@@ -80,6 +81,7 @@ class CameraOptocoupler: public CameraControl {
     void startPhoto();  // to initialise taking the photo
     void run();         // needs to be called frequently in order to toggle pins
     bool finishedPhoto();  // returns true when the photo is done.
+    void stop();  // immediately stop everything we are doing.
 
     void photoBlocking();  // performs a photo in blocking manner.
 

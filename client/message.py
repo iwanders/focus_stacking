@@ -6,7 +6,9 @@ msg_type_t = namedtuple("msg_type", ["nop",
                                      "set_config",
                                      "get_config",
                                      "start_stack",
-                                     "action_motor"])
+                                     "action_motor",
+                                     "action_photo",
+                                     "action_stop"])
 msg_type = msg_type_t(*range(0, len(msg_type_t._fields)))
 # can do msg_type.nop now.
 
