@@ -1,2 +1,4 @@
+CherryPy==5.1.0
 pyserial==3.0.1
 wheel==0.26.0
+ws4py==0.3.4
