@@ -1,0 +1,5 @@
+
+/* Ensure that the content is below the navbar */
+body {
+	padding-top: 70px;
+}

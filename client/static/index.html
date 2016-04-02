@@ -1,7 +1,42 @@
-<html>
-    <head>
-    </head>
-    <body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>Bootstrap 101 Template</title>
+
+    <link href="dependencies/bootstrap-3.3.6-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="customization.css" rel="stylesheet">
+    
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="#">Link</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Action</a></li>
+                  <li><a href="#">Another action</a></li>
+                  <li><a href="#">Something else here</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#">Separated link</a></li>
+                </ul>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+        <h1>Hello, world!</h1>
+
+
         <a href="#" onclick="sendthing();">Click to send stuff</a>
         <p id="log">
         </p>
@@ -34,5 +69,14 @@
             socket.send("Sending test 1, 2, 3..");
         }
         </script>
-    </body>
+
+
+
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="dependencies/jquery-2.2.2.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="dependencies/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+  </body>
 </html>
+        
