@@ -48,10 +48,10 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
             msg.from_dict(msgdata)
             print(msg)
             data = msg
-        else:
-            data = msgdata
+            self.stacker.put_message(data)
 
-        self.stacker.put_command((msgtype, data))
+        if (msgtype == "connect_serial"):
+            self.stacker.connect(msgdata["device"])
 
     def closed(self, code, reason=None):
         print("Websocket was closed.")
@@ -85,8 +85,7 @@ if __name__ == "__main__":
     def broadcaster():
         m = stack_interface.get_message()
         if m:
-            mtype, mdata = m
-            msg = {"type": mtype, "data": dict(mdata)}
+            msg = ["serial", dict(m)]
             a.broadcast(json.dumps(msg))
 
     # use this very fancy cherrypy monitor to run our broadcaster.

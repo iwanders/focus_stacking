@@ -34,13 +34,9 @@ class StackInterface(threading.Thread):
                                      timeout=packet_read_timeout,
                                      **kwargs)
             logging.debug("Succesfully connected to {}.".format(serial_port))
-            self.rx.put_nowait(("meta",
-                                {"success": "Connected to {}.".format(
-                                                            serial_port)}))
             return True
         except serial.SerialException as e:
             logging.warn("Failed to connect to {}".format(serial_port))
-            self.rx.put_nowait(("meta", {"error": str(e)}))
             return False
 
     def stop(self):
@@ -59,11 +55,10 @@ class StackInterface(threading.Thread):
                 # Did we get the correct number of bytes? If so queue it.
                 if (d == self.packet_size):
                     msg = message.Msg.read(buffer)
-                    self.rx.put_nowait(("serial", msg))
+                    self.rx.put_nowait(msg)
                 else:
                     logging.warn("Received incomplete packet, discarded.")
         except serial.SerialException as e:
-            self.put_rx_meta({"error": str(e)})
             self.ser.close()
             self.ser = None
 
@@ -75,19 +70,12 @@ class StackInterface(threading.Thread):
             pass  # there was no data there.
             return
 
-        msgtype, msgdata = msg
-
-        if msgtype == "serial":
-            try:
-                print("Processing serial {}, {}".format(msgtype, msgdata))
-                self.ser.write(bytes(msgdata))
-            except serial.SerialException:
-                self.ser.close()
-                self.ser = None
-
-        if msgtype == "meta":
-            print("Got meta message")
-            logging.debug("Got a meta message")
+        try:
+            print("Processing {}".format(msg))
+            self.ser.write(bytes(msg))
+        except serial.SerialException:
+            self.ser.close()
+            self.ser = None
 
     def run(self):
         self.running = True
@@ -101,10 +89,10 @@ class StackInterface(threading.Thread):
                 continue
             self.process_rx()  # read from serial port
 
-    def put_command(self, command):
-        self.tx.put_nowait(command)
+    def put_message(self, message):
+        self.tx.put_nowait(message)
 
-    # try to get a Command from the rx queue
+    # try to get a message from the rx queue
     def get_message(self):
         try:
             msg = self.rx.get_nowait()
@@ -117,18 +105,13 @@ class StackInterface(threading.Thread):
         while(True):
             try:
                 time.sleep(0.01)
-                res = self.get_message()
-                if (not res):
-                    continue
-                mtype, data = res
-                if (mtype == "meta"):
-                    print("{}: {}".format(mtype, data))
-                if (mtype == "serial"):
+                m = self.get_message()
+                if (m):
                     # print(m)
                     break
             except KeyboardInterrupt:
                 break
-        return data
+        return m
 
 
 # function that returns a dictionary of potential ports
@@ -180,7 +163,7 @@ if __name__ == "__main__":
 
     # we are retrieving something.
     if (args.command.startswith("get_")):
-        a.put_command(("serial", msg))
+        a.put_message(msg)
         m = a.wait_for_message()
         print(m)
         a.stop()
@@ -197,9 +180,9 @@ if __name__ == "__main__":
         print("Sending {}".format(msg))
 
         # send the message and wait until it is really gone.
-        a.put_command(("serial", msg))
+        a.put_message(msg)
         while(not a.tx.empty()):
-            time.sleep(0.01)
+            time.sleep(0.1)
 
         a.stop()
         a.join()

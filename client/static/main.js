@@ -34,7 +34,7 @@ Stack.prototype.onmessage = function(msg) {
 };
 
 Stack.prototype.connect_serial = function (device) {
-    this.send("meta", {action:"connect_serial", device:device});
+    this.send("connect_serial", {device:device});
 }
 
 Stack.prototype.test = function(){
@@ -72,9 +72,9 @@ $( document ).ready(function() {
                 var entry = $('<li><a href="#" class=' + style_additives + ' data-device="' + val.device + '">' + val.device + ' - ' + val.manufacturer +  '</a></li>');
                 $(entry).select('a').on("click", function (){
                     // console.log( $( event.data).text() );
-                    $.getJSON("connect_to_serial", {device:val.device}, function( data ) {
-                       console.log(data);
-                    });
+                    // $.getJSON("connect_to_serial", {device:val.device}, function( data ) {
+                       // console.log(data);
+                    // });
 
                     stacker.connect_serial(val.device);
                 });
