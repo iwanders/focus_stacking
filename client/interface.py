@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+from collections import namedtuple
 import json
 import logging
 import serial
@@ -11,6 +12,8 @@ import time
 import queue
 
 import message
+
+Command = namedtuple("Command", ["type", "data"])
 
 
 class StackInterface(threading.Thread):
@@ -44,38 +47,52 @@ class StackInterface(threading.Thread):
         if (self.ser):
             self.ser.close()
 
+    def process_rx(self):
+        # try to read message from serial port
+        try:
+            if (self.ser.inWaiting()):
+                buffer = bytearray(64)
+                d = self.ser.readinto(buffer)
+
+                # Did we get the correct number of bytes? If so queue it.
+                if (d == self.packet_size):
+                    msg = message.Msg.read(buffer)
+                    self.rx.put_nowait(Command("serial", msg))
+                else:
+                    logging.warn("Received incomplete packet, discarded.")
+        except serial.SerialException as e:
+            self.rx.put_nowait(Command("meta", {"error":str(e)}))
+            self.stop()
+
+    def process_tx(self):
+        # try to put a message on the serial port from the queue
+        try:
+            msg = self.tx.get_nowait()
+        except queue.Empty:
+            pass  # there was no data there.
+            return
+
+        if msg.type == "serial":
+            try:
+                self.ser.write(bytes(msg.data))
+            except serial.SerialException:
+                self.ser.clos()
+                self.ser = None
+
+        if msg.type == "meta":
+            logging.debug("Got a meta message")
+
     def run(self):
         self.running = True
         while (self.running):
-            if (self.ser is None):
-                self.stop()
-
-            # try to read message from serial port
-            if (self.ser.inWaiting()):
-                try:
-                    buffer = bytearray(64)
-                    d = self.ser.readinto(buffer)
-
-                    # Did we get the correct number of bytes? If so queue it.
-                    if (d == self.packet_size):
-                        msg = message.Msg.read(buffer)
-                        self.rx.put_nowait(msg)
-                    else:
-                        logging.warn("Received incomplete packet, discarded.")
-                except serial.SerialException:
-                    self.stop()
-
-            # try to put a message on the serial port from the queue
-            try:
-                msg = self.tx.get_nowait()
-                self.ser.write(bytes(msg))
-            except queue.Empty:
-                pass  # there was no data there.
-            except serial.SerialException:
-                self.stop()
-
             # small sleep to prevent this loop from running too fast.
             time.sleep(0.001)
+
+            self.process_tx()  # read from the tx queue
+
+            if (self.ser is None):
+                continue
+            self.process_rx()  # read from serial port
 
     def get_message(self):
         try:
@@ -84,9 +101,11 @@ class StackInterface(threading.Thread):
         except queue.Empty:
             return None
 
+    # for command line tool
     def put_message(self, msg):
-        self.tx.put_nowait(msg)
+        self.tx.put_nowait(Command("serial", msg))
 
+    # for command line tool
     def wait_for_message(self):
         while(True):
             try:
@@ -151,7 +170,8 @@ if __name__ == "__main__":
     if (args.command.startswith("get_")):
         a.put_message(msg)
         m = a.wait_for_message()
-        print(m)
+        print("Type: {}".format(m.type))
+        print("Data: {}".format(m.data))
         a.stop()
         a.join()
         sys.exit(0)
