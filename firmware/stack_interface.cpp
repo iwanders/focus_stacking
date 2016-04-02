@@ -67,9 +67,13 @@ void StackInterface::processCommand(const msg_t* msg) {
     case set_config:
       SIDBGln("Got set_config.");
 
+      // store these configs for later use
       config_motor_ = msg->config.motor;
       config_camera_ = msg->config.camera;
       config_stack_ = msg->config.stack;
+
+      // also set them.
+      setConfigs();
 
       this->setConfig(msg->config.interface);
       break;
@@ -79,7 +83,8 @@ void StackInterface::processCommand(const msg_t* msg) {
         char buffer[sizeof(msg_t)] = {0};
         msg_t* response = reinterpret_cast<msg_t*>(buffer);
         response->type = get_config;
-        retrieveConfigs();
+
+        // retrieve the configs.
         response->config.motor = config_motor_;
         response->config.camera = config_camera_;
         response->config.stack = config_stack_;
