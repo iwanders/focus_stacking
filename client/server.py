@@ -2,6 +2,7 @@
 
 import cherrypy
 import os
+import json
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.manager import WebSocketManager
 import ws4py
@@ -29,6 +30,7 @@ class FocusStackRoot:
         result = self.stack.connect(device)
         return {"result": result}
 
+
 class WebsocketHandler(ws4py.websocket.WebSocket):
 
     def __init__(self, callback, *args, **kwargs):
@@ -55,6 +57,7 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
             return z
         return factory
 
+
 if __name__ == "__main__":
 
     # Add the websocket requirements.
@@ -64,10 +67,19 @@ if __name__ == "__main__":
     a.manager = WebSocketManager()
     a.subscribe()
 
-
     stack_interface = interface.StackInterface()
-
     server_tree = FocusStackRoot(stack_interface)
+
+    def broadcaster():
+        m = stack_interface.get_message()
+        if m:
+            msg = {"type": m.type, "data": m.data}
+            a.broadcast(json.dumps(msg))
+
+    # use this very fancy cherrypy monitor to run our broadcaster.
+    cherrypy.process.plugins.Monitor(cherrypy.engine,
+                                     broadcaster,
+                                     frequency=0.01).subscribe()
 
     cherrypy.config.update({"server.socket_host": "127.0.0.1",
                             "server.socket_port": 8080})

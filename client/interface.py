@@ -36,9 +36,11 @@ class StackInterface(threading.Thread):
                                      timeout=packet_read_timeout,
                                      **kwargs)
             logging.debug("Succesfully connected to {}.".format(serial_port))
+            self.send_meta({"success": "Connected to {}.".format(serial_port)})
             return True
         except serial.SerialException as e:
             logging.warn("Failed to connect to {}".format(serial_port))
+            self.send_meta({"error": str(e)})
             return False
 
     def stop(self):
@@ -61,8 +63,13 @@ class StackInterface(threading.Thread):
                 else:
                     logging.warn("Received incomplete packet, discarded.")
         except serial.SerialException as e:
-            self.rx.put_nowait(Command("meta", {"error":str(e)}))
-            self.stop()
+            self.send_meta({"error": str(e)})
+            self.ser.close()
+            self.ser = None
+
+    # sends a meta type command to the rx queue. Basically back to the GUI.
+    def send_meta(self, data):
+        self.rx.put_nowait(Command("meta", data))
 
     def process_tx(self):
         # try to put a message on the serial port from the queue
@@ -76,7 +83,7 @@ class StackInterface(threading.Thread):
             try:
                 self.ser.write(bytes(msg.data))
             except serial.SerialException:
-                self.ser.clos()
+                self.ser.close()
                 self.ser = None
 
         if msg.type == "meta":
@@ -111,7 +118,9 @@ class StackInterface(threading.Thread):
             try:
                 time.sleep(0.01)
                 m = self.get_message()
-                if (m):
+                if (m.type == "meta"):
+                    print("{}: {}".format(m.type, m.data))
+                if (m.type == "serial"):
                     # print(m)
                     break
             except KeyboardInterrupt:
