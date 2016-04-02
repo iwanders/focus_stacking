@@ -8,6 +8,7 @@ from ws4py.manager import WebSocketManager
 import ws4py
 
 import interface
+import message
 
 
 class FocusStackRoot:
@@ -33,15 +34,24 @@ class FocusStackRoot:
 
 class WebsocketHandler(ws4py.websocket.WebSocket):
 
-    def __init__(self, callback, *args, **kwargs):
+    def __init__(self, stack_interface, *args, **kwargs):
         super(WebsocketHandler, self).__init__(*args, **kwargs)
         cherrypy.log("Test")
-        self.callback = callback
+        self.stacker = stack_interface
 
-    def received_message(self, message):
-        print("Got message from websocket {}.".format(message))
-        self.callback("Calling fun: {}".format(message))
-        self.send("Echo: {}".format(message))
+    def received_message(self, msg):
+        decoded_json = json.loads(str(msg))
+        msgtype, msgdata = decoded_json
+
+        if (msgtype == "serial"):
+            msg = message.Msg()
+            msg.from_dict(msgdata)
+            print(msg)
+            data = msg
+        else:
+            data = msgdata
+
+        self.stacker.put_command((msgtype, data))
 
     def closed(self, code, reason=None):
         print("Websocket was closed.")
@@ -51,9 +61,9 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
         print("Socket shutdown")
 
     @classmethod
-    def with_callback(cls, callbackfun):
+    def with_callback(cls, stack_instance):
         def factory(*args, **kwargs):
-            z = cls(callbackfun, *args, **kwargs)
+            z = cls(stack_instance, *args, **kwargs)
             return z
         return factory
 
@@ -68,12 +78,15 @@ if __name__ == "__main__":
     a.subscribe()
 
     stack_interface = interface.StackInterface()
+    stack_interface.daemon = True
+    stack_interface.start()
     server_tree = FocusStackRoot(stack_interface)
 
     def broadcaster():
         m = stack_interface.get_message()
         if m:
-            msg = {"type": m.type, "data": m.data}
+            mtype, mdata = m
+            msg = {"type": mtype, "data": dict(mdata)}
             a.broadcast(json.dumps(msg))
 
     # use this very fancy cherrypy monitor to run our broadcaster.
@@ -94,6 +107,6 @@ if __name__ == "__main__":
                     "tools.staticdir.index": "index.html"},
               "/ws": {"tools.websocket.on": True,
                       "tools.websocket.handler_cls":
-                      WebsocketHandler.with_callback(print)}
+                      WebsocketHandler.with_callback(stack_interface)}
               }
     cherrypy.quickstart(server_tree, '/', config=config)

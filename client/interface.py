@@ -13,8 +13,6 @@ import queue
 
 import message
 
-Command = namedtuple("Command", ["type", "data"])
-
 
 class StackInterface(threading.Thread):
     def __init__(self, packet_size=64):
@@ -36,11 +34,13 @@ class StackInterface(threading.Thread):
                                      timeout=packet_read_timeout,
                                      **kwargs)
             logging.debug("Succesfully connected to {}.".format(serial_port))
-            self.send_meta({"success": "Connected to {}.".format(serial_port)})
+            self.rx.put_nowait(("meta",
+                                {"success": "Connected to {}.".format(
+                                                            serial_port)}))
             return True
         except serial.SerialException as e:
             logging.warn("Failed to connect to {}".format(serial_port))
-            self.send_meta({"error": str(e)})
+            self.rx.put_nowait(("meta", {"error": str(e)}))
             return False
 
     def stop(self):
@@ -59,17 +59,13 @@ class StackInterface(threading.Thread):
                 # Did we get the correct number of bytes? If so queue it.
                 if (d == self.packet_size):
                     msg = message.Msg.read(buffer)
-                    self.rx.put_nowait(Command("serial", msg))
+                    self.rx.put_nowait(("serial", msg))
                 else:
                     logging.warn("Received incomplete packet, discarded.")
         except serial.SerialException as e:
-            self.send_meta({"error": str(e)})
+            self.put_rx_meta({"error": str(e)})
             self.ser.close()
             self.ser = None
-
-    # sends a meta type command to the rx queue. Basically back to the GUI.
-    def send_meta(self, data):
-        self.rx.put_nowait(Command("meta", data))
 
     def process_tx(self):
         # try to put a message on the serial port from the queue
@@ -79,14 +75,18 @@ class StackInterface(threading.Thread):
             pass  # there was no data there.
             return
 
-        if msg.type == "serial":
+        msgtype, msgdata = msg
+
+        if msgtype == "serial":
             try:
-                self.ser.write(bytes(msg.data))
+                print("Processing serial {}, {}".format(msgtype, msgdata))
+                self.ser.write(bytes(msgdata))
             except serial.SerialException:
                 self.ser.close()
                 self.ser = None
 
-        if msg.type == "meta":
+        if msgtype == "meta":
+            print("Got meta message")
             logging.debug("Got a meta message")
 
     def run(self):
@@ -101,6 +101,10 @@ class StackInterface(threading.Thread):
                 continue
             self.process_rx()  # read from serial port
 
+    def put_command(self, command):
+        self.tx.put_nowait(command)
+
+    # try to get a Command from the rx queue
     def get_message(self):
         try:
             msg = self.rx.get_nowait()
@@ -109,23 +113,22 @@ class StackInterface(threading.Thread):
             return None
 
     # for command line tool
-    def put_message(self, msg):
-        self.tx.put_nowait(Command("serial", msg))
-
-    # for command line tool
     def wait_for_message(self):
         while(True):
             try:
                 time.sleep(0.01)
-                m = self.get_message()
-                if (m.type == "meta"):
-                    print("{}: {}".format(m.type, m.data))
-                if (m.type == "serial"):
+                res = self.get_message()
+                if (not res):
+                    continue
+                mtype, data = res
+                if (mtype == "meta"):
+                    print("{}: {}".format(mtype, data))
+                if (mtype == "serial"):
                     # print(m)
                     break
             except KeyboardInterrupt:
                 break
-        return m
+        return data
 
 
 # function that returns a dictionary of potential ports
@@ -177,10 +180,9 @@ if __name__ == "__main__":
 
     # we are retrieving something.
     if (args.command.startswith("get_")):
-        a.put_message(msg)
+        a.put_command(("serial", msg))
         m = a.wait_for_message()
-        print("Type: {}".format(m.type))
-        print("Data: {}".format(m.data))
+        print(m)
         a.stop()
         a.join()
         sys.exit(0)
@@ -195,7 +197,7 @@ if __name__ == "__main__":
         print("Sending {}".format(msg))
 
         # send the message and wait until it is really gone.
-        a.put_message(msg)
+        a.put_command(("serial", msg))
         while(not a.tx.empty()):
             time.sleep(0.01)
 

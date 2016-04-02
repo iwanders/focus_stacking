@@ -40,41 +40,6 @@
         <h1>Hello, world!</h1>
 
 
-        <a href="#" onclick="sendthing();">Click to send stuff</a>
-        <p id="log">
-        </p>
-        <script type="text/javascript">
-        function logmessage(msg){
-            document.getElementById('log').innerHTML = document.getElementById('log').innerHTML + msg + "<br />";
-        }
-        try {
-            var socket = new WebSocket("ws://127.0.0.1:8080/ws");
-            logmessage(socket.readyState);
-
-            socket.onclose = function() {
-                     logmessage("Status " + socket.readyState+ " onclose event.");
-            }
-
-            socket.onopen = function() {
-                     logmessage("Status " + socket.readyState+ " onopen event.");
-            }
-
-            socket.onmessage = function(msg) {
-                     logmessage("Received: " + msg.data);
-            }
-
-
-        } catch(exception){
-                     logmessage("Failure: " + exception);
-        }
-
-        function sendthing(){
-            socket.send("Sending test 1, 2, 3..");
-        }
-        </script>
-
-
-
     </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="dependencies/jquery-2.2.2.min.js"></script>
