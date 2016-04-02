@@ -1,21 +1,33 @@
 #!/usr/bin/env python3
 
-import os
 import cherrypy
+import os
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.manager import WebSocketManager
 import ws4py
 
+import interface
 
-class Root(object):
-    def __init__(self):
-        pass
+
+class FocusStackRoot:
+    def __init__(self, stack_interface):
+        self.stack = stack_interface
 
     @cherrypy.expose
     def ws(self):
         handler = cherrypy.request.ws_handler
     ws._cp_config = {'tools.staticdir.on': False}
 
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_serial_ports(self):
+        return interface.get_potential_ports()
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def connect_to_serial(self, device):
+        result = self.stack.connect(device)
+        return {"result": result}
 
 class WebsocketHandler(ws4py.websocket.WebSocket):
 
@@ -52,17 +64,10 @@ if __name__ == "__main__":
     a.manager = WebSocketManager()
     a.subscribe()
 
-    # just here to test broadcasting from server.
-    import threading
-    import time
 
-    def broadcaster():
-        while(True):
-            print("Looping broadcaster.")
-            time.sleep(5)
-            a.broadcast("Test: {}".format(time.time()))
-    threading.Timer(0, broadcaster).start()
-    # this does not die gracefully....
+    stack_interface = interface.StackInterface()
+
+    server_tree = FocusStackRoot(stack_interface)
 
     cherrypy.config.update({"server.socket_host": "127.0.0.1",
                             "server.socket_port": 8080})
@@ -79,4 +84,4 @@ if __name__ == "__main__":
                       "tools.websocket.handler_cls":
                       WebsocketHandler.with_callback(print)}
               }
-    cherrypy.quickstart(Root(), '/', config=config)
+    cherrypy.quickstart(server_tree, '/', config=config)

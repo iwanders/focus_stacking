@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-import serial
 import argparse
+import json
 import logging
+import serial
+import serial.tools.list_ports
+import sys
 import threading
 import time
 import queue
-import json
-import sys
 
 import message
 
@@ -32,9 +33,10 @@ class StackInterface(threading.Thread):
                                      timeout=packet_read_timeout,
                                      **kwargs)
             logging.debug("Succesfully connected to {}.".format(serial_port))
-
+            return True
         except serial.SerialException as e:
             logging.warn("Failed to connect to {}".format(serial_port))
+            return False
 
     def stop(self):
         self.running = False
@@ -96,6 +98,19 @@ class StackInterface(threading.Thread):
             except KeyboardInterrupt:
                 break
         return m
+
+
+# function that returns a dictionary of potential ports
+def get_potential_ports():
+    ports = []
+    for ser in serial.tools.list_ports.comports():
+        likely = ser.manufacturer == "Teensyduino"
+        ports.append({"name": ser.name,
+                      "device": ser.device,
+                      "manufacturer": ser.manufacturer,
+                      "product": ser.product,
+                      "likely": likely})
+    return ports
 
 
 if __name__ == "__main__":

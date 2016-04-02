@@ -16,22 +16,25 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
-            <ul class="nav navbar-nav navbar-right">
-              <li><a href="#">Link</a></li>
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li><a href="#">Action</a></li>
-                  <li><a href="#">Another action</a></li>
-                  <li><a href="#">Something else here</a></li>
-                  <li class="divider"></li>
-                  <li><a href="#">Separated link</a></li>
-                </ul>
-              </li>
-            </ul>
+            <a href="https://github.com/iwanders/focus_stacking" class="navbar-brand">Focus Stacking</a>
         </div>
+
+        <ul class="nav navbar-nav">
+            <li><a href="#" id="navbar_status">Status</a></li>
+            <li><a href="#" data-toggle="modal" data-target="#settings" onclick="console.log('show settings');">Settings</a></li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown" id="navbar_port_dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="navbar_port_click">Choose serial port<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                </ul>
+            </li>
+        </ul>
       </div>
     </nav>
+
+
 
     <div class="container">
         <h1>Hello, world!</h1>
@@ -77,6 +80,7 @@
     <script src="dependencies/jquery-2.2.2.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="dependencies/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+    <script src="main.js"></script>
   </body>
 </html>
         
