@@ -22,17 +22,17 @@ msg_type_lookup = dict((v, k) for v, k in list(enumerate(msg_type_t._fields)))
 
 
 # Convenience mixin to allow construction of struct from a byte like object.
-class readable():
+class Readable:
     @classmethod
-    def read(self, byte_object):
-        a = self()
+    def read(cls, byte_object):
+        a = cls()
         ctypes.memmove(ctypes.addressof(a), bytes(byte_object),
-                       min(len(byte_object), ctypes.sizeof(self)))
+                       min(len(byte_object), ctypes.sizeof(cls)))
         return a
 
 
 # Mixin to allow conversion of a ctypes structure to and from a dictionary.
-class dictionary():
+class Dictionary:
     def __iter__(self):
         for k, t in self._fields_:
             if (issubclass(t, ctypes.Structure)):
@@ -55,37 +55,37 @@ class dictionary():
 
 
 # Structs for the various parts in the stacking firmware.
-class ConfigMotorStepper(ctypes.LittleEndianStructure, dictionary):
+class ConfigMotorStepper(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("min_width", ctypes.c_uint),
                 ("max_width", ctypes.c_uint),
                 ("ramp_length", ctypes.c_uint)]
 
 
-class ConfigCameraOptocoupler(ctypes.LittleEndianStructure, dictionary):
+class ConfigCameraOptocoupler(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("focus_duration", ctypes.c_uint),
                 ("shutter_duration", ctypes.c_uint)]
 
 
-class ConfigStackControl(ctypes.LittleEndianStructure, dictionary):
+class ConfigStackControl(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("stack_count", ctypes.c_uint),
                 ("delay_before_photo", ctypes.c_uint),
                 ("delay_after_photo", ctypes.c_uint),
                 ("move_steps", ctypes.c_int)]
 
 
-class ConfigStackInterface(ctypes.LittleEndianStructure, dictionary):
+class ConfigStackInterface(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("status_interval", ctypes.c_uint)]
 
 
 # A message config consists of this:
-class MsgConfig(ctypes.LittleEndianStructure, dictionary):
+class MsgConfig(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("motor", ConfigMotorStepper),
                 ("camera", ConfigCameraOptocoupler),
                 ("stack", ConfigStackControl),
                 ("interface", ConfigStackInterface)]
 
 
-class ActionMotor(ctypes.LittleEndianStructure, dictionary):
+class ActionMotor(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("steps", ctypes.c_int)]
 
 
@@ -95,7 +95,7 @@ class _MsgBody(ctypes.Union):
                 ("raw", ctypes.c_byte * (64-4))]
 
 
-class Msg(ctypes.LittleEndianStructure, readable):
+class Msg(ctypes.LittleEndianStructure, Readable):
     type = msg_type
     _fields_ = [("msg_type", ctypes.c_uint),
                 ("_body", _MsgBody)]

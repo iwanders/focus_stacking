@@ -36,13 +36,12 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
     def shutdown(self):
         print("Socket shutdown")
 
-
-def WebsocketHandlerFactory(callbackfun):
-    def factory(*args, **kwargs):
-        z = WebsocketHandler(callbackfun, *args, **kwargs)
-        return z
-    return factory
-
+    @classmethod
+    def with_callback(cls, callbackfun):
+        def factory(*args, **kwargs):
+            z = cls(callbackfun, *args, **kwargs)
+            return z
+        return factory
 
 if __name__ == "__main__":
 
@@ -78,6 +77,6 @@ if __name__ == "__main__":
                     "tools.staticdir.index": "index.html"},
               "/ws": {"tools.websocket.on": True,
                       "tools.websocket.handler_cls":
-                      WebsocketHandlerFactory(print)}
+                      WebsocketHandler.with_callback(print)}
               }
     cherrypy.quickstart(Root(), '/', config=config)

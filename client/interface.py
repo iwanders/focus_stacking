@@ -125,15 +125,15 @@ if __name__ == "__main__":
         parser.exit()
         sys.exit(1)
 
+    msg = message.Msg()
+    msg.msg_type = getattr(msg.type, args.command)
+
+    a = StackInterface()
+    a.connect(args.port)
+    a.start()
+
     # we are retrieving something.
     if (args.command.startswith("get_")):
-        msg = message.Msg()
-        msg.msg_type = getattr(msg.type, args.command)
-
-        a = StackInterface()
-        a.connect(args.port)
-        a.start()
-
         a.put_message(msg)
         m = a.wait_for_message()
         print(m)
@@ -141,20 +141,16 @@ if __name__ == "__main__":
         a.join()
         sys.exit(0)
 
+    # sending something
     if (args.command.startswith("set_") or command.startswith("action_")):
         command_id = getattr(message.msg_type, args.command)
-        msg = message.Msg()
-        msg.msg_type = getattr(msg.type, args.command)
         if (command_id in message.msg_type_field):
             fieldname = message.msg_type_field[command_id]
             d = {fieldname: json.loads(args.config)}
             msg.from_dict(d)
         print("Sending {}".format(msg))
 
-        a = StackInterface()
-        a.connect(args.port)
-        a.start()
-
+        # send the message and wait until it is really gone.
         a.put_message(msg)
         while(not a.tx.empty()):
             time.sleep(0.01)
