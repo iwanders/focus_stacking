@@ -29,12 +29,34 @@ var current_config = {
 
 
 function setMotorElements(){
-    $('#motor_min_width').val(current_config["config"]["motor"]["min_width"]);
-    $('#motor_max_width').val(current_config["config"]["motor"]["max_width"]);
-    $('#motor_ramp_length').val(current_config["config"]["motor"]["ramp_length"]);
+    $('#motor_min_width input').val(current_config.config.motor.min_width);
+    $('#motor_max_width input').val(current_config.config.motor.max_width);
+    $('#motor_ramp_length input').val(current_config.config.motor.ramp_length);
+}
+
+function getMotorElements(){
+    current_config.config.motor.min_width = parseFloat($('#motor_min_width input').val());
+    current_config.config.motor.max_width = parseFloat($('#motor_max_width input').val());
+    current_config.config.motor.ramp_length = parseFloat($('#motor_ramp_length input').val());
+}
+
+function setCameraElements(){
+    $('#camera_focus_duration').val(current_config.config.camera.focus_duration);
+    $('#camera_shutter_duration').val(current_config.config.camera.shutter_duration);
+    
+}
+function getCameraElements(){
+    current_config.config.camera.focus_duration = parseFloat($('#camera_focus_duration').val());
+    current_config.config.camera.shutter_duration = parseFloat($('#camera_shutter_duration').val());
 }
 function setAllElements(){
     setMotorElements();
+    setCameraElements();
+}
+
+function getAllElements(){
+    getMotorElements();
+    getCameraElements();
 }
 
 
@@ -106,8 +128,8 @@ $( document ).ready(function() {
     stacker.attachCommandHandler("serial_get_config", function (command, payload) {
         current_config["config"] = payload["config"]
         setAllElements();
+        $('#motor_min_width input').trigger("change");
     });
-
 
     stacker.attachCommandHandler("onopen", function (){
         $('#no_websocket_error').hide();
@@ -150,5 +172,31 @@ $( document ).ready(function() {
         });
     });
 
+
+    $('#motor_config_upload').click(function (event){
+        console.log(event);
+        getAllElements();
+        stacker.serial_set_config(current_config["config"]);
+        stacker.serial_get_config();
+        this.blur();
+    });
+    $('#motor_config_move').click(function (event){
+        console.log(event);
+        var steps = parseFloat($('#motor_config_move_steps').val());
+        stacker.serial_action_motor(steps);
+        this.blur();
+    });
+
+    $('#motor_min_width input').change(function () {
+        var number = parseFloat($(this).val());
+        console.log("Change number: " + number);
+        if (number == current_config.config.motor.min_width){
+            console.log("identical");
+            $('#motor_min_width').addClass('has-success');
+        } else {
+            console.log("different");
+            $('#motor_min_width').removeClass('has-success');
+        }
+    });
 
 });

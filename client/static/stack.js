@@ -106,3 +106,12 @@ Stack.prototype.serial_get_config = function(){
     this.send("serial", {"msg_type":"get_config"});
 }
 
+Stack.prototype.serial_set_config = function(config){
+    this.send("serial", {"msg_type":"set_config", "config":config});
+}
+
+
+Stack.prototype.serial_action_motor = function(steps){
+    this.send("serial", {"msg_type":"action_motor", "action_motor":{"steps":steps}});
+}
+
