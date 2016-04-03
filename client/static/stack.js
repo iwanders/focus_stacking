@@ -115,3 +115,41 @@ Stack.prototype.serial_action_motor = function(steps){
     this.send("serial", {"msg_type":"action_motor", "action_motor":{"steps":steps}});
 }
 
+Stack.prototype.flatten_config = function (cfg) {
+    var flat_config = {};
+    flat_config["motor_min_width"] = cfg.motor.min_width;
+    flat_config["motor_max_width"] = cfg.motor.max_width;
+    flat_config["motor_ramp_length"] = cfg.motor.ramp_length;
+
+    flat_config["camera_shutter_duration"] = cfg.camera.shutter_duration;
+    flat_config["camera_focus_duration"] = cfg.camera.focus_duration;
+
+    flat_config["stack_stack_count"] = cfg.stack.stack_count;
+    flat_config["stack_delay_after_photo"] = cfg.stack.delay_after_photo;
+    flat_config["stack_delay_before_photo"] = cfg.stack.delay_before_photo;
+    flat_config["stack_stack_count"] = cfg.stack.stack_count;
+    flat_config["stack_move_steps"] = cfg.stack.move_steps;
+
+    flat_config["interface_status_interval"] = cfg.interface.status_interval;
+
+    return flat_config;
+}
+Stack.prototype.unflatten_config = function (flat_config) {
+    var cfg = {motor:{}, camera:{}, stack:{}, interface:{}};
+    cfg.motor.min_width = flat_config["motor_min_width"];
+    cfg.motor.max_width = flat_config["motor_max_width"];
+    cfg.motor.ramp_length = flat_config["motor_ramp_length"];
+
+    cfg.camera.shutter_duration = flat_config["camera_shutter_duration"];
+    cfg.camera.focus_duration = flat_config["camera_focus_duration"];
+
+    cfg.stack.stack_count = flat_config["stack_stack_count"];
+    cfg.stack.delay_after_photo = flat_config["stack_delay_after_photo"];
+    cfg.stack.delay_before_photo = flat_config["stack_delay_before_photo"];
+    cfg.stack.stack_count = flat_config["stack_stack_count"];
+    cfg.stack.move_steps = flat_config["stack_move_steps"];
+
+    cfg.interface.status_interval = flat_config["interface_status_interval"];
+
+    return cfg;
+}

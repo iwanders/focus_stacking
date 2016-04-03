@@ -2,70 +2,51 @@
 
 var stacker = new Stack();
 var current_config = {
-                        config: {
-                            motor:{
-                                min_width: 500,
-                                max_width: 4000,
-                                ramp_length:100,
-                            },
-                            camera:{
-                                shutter_duration: 500,
-                                focus_duration: 500,
-                            },
-                            stack:{
-                                delay_after_photo: 1000,
-                                delay_before_photo: 1000,
-                                stack_count: 5,
-                                move_steps: 100
-                            },
-                            inferface:{
-                                status_interval: 100,
-                            }
-                        },
-                        misc: {
-                                transmission_ratio:1
-                        }
-                    };
+                        motor_min_width: 500,
+                        motor_max_width: 4000,
+                        motor_ramp_length:100,
 
+                        camera_shutter_duration: 500,
+                        camera_focus_duration: 500,
 
-function setMotorElements(){
-    $('#motor_min_width input').val(current_config.config.motor.min_width);
-    $('#motor_max_width input').val(current_config.config.motor.max_width);
-    $('#motor_ramp_length input').val(current_config.config.motor.ramp_length);
-}
+                        stack_delay_after_photo: 1000,
+                        stack_delay_before_photo: 1000,
+                        stack_stack_count: 5,
+                        stack_move_steps: 100,
 
-function getMotorElements(){
-    current_config.config.motor.min_width = parseFloat($('#motor_min_width input').val());
-    current_config.config.motor.max_width = parseFloat($('#motor_max_width input').val());
-    current_config.config.motor.ramp_length = parseFloat($('#motor_ramp_length input').val());
-}
+                        interface_status_interval: 100,
 
-function setCameraElements(){
-    $('#camera_focus_duration').val(current_config.config.camera.focus_duration);
-    $('#camera_shutter_duration').val(current_config.config.camera.shutter_duration);
-    
-}
-function getCameraElements(){
-    current_config.config.camera.focus_duration = parseFloat($('#camera_focus_duration').val());
-    current_config.config.camera.shutter_duration = parseFloat($('#camera_shutter_duration').val());
-}
-function setAllElements(){
-    setMotorElements();
-    setCameraElements();
+                        ui_transmission_ratio:1,
+                };
+
+var config_element_relations = {
+    motor_min_width : {selector:'#motor_min_width input', key: "motor_min_width", parser:parseFloat},
+    motor_max_width : {selector:'#motor_max_width input', key: "motor_max_width", parser:parseFloat},
+    motor_ramp_length : {selector:'#motor_ramp_length input', key: "motor_ramp_length", parser:parseFloat},
+
+    camera_shutter_duration : {selector:'#camera_shutter_duration input', key: "camera_shutter_duration", parser:parseFloat},
+    camera_focus_duration : {selector:'#camera_focus_duration input', key: "camera_focus_duration", parser:parseFloat},
 }
 
 function getAllElements(){
-    getMotorElements();
-    getCameraElements();
+    $.each(config_element_relations, function (k, v){
+        current_config[v.key] = v.parser($(v.selector).val());
+    });
 }
 
+function setAllElements(){
+    $.each(config_element_relations, function (k, v){
+        $(v.selector).val(current_config[v.key]);
+        $(v.selector).trigger("change");
+    });
+}
 
 /*
     Attach hooks and do stuff...
 */
 
 /*
-    On page reade we do the following:
+    On page ready we do the following:
         connect to the websocket. 
             - If this fails, display a noticed.
             - If this is successful, remove notice.
@@ -84,6 +65,26 @@ $( document ).ready(function() {
     console.log( "ready!" );
     stacker.open($(location).attr('host') + "/ws");
 
+    $.each(config_element_relations, function (k, v){
+        console.log("k");
+        console.log(k);
+        console.log("v");
+        console.log(v);
+
+        $(v.selector).change(function () {
+            var number = v.parser($(this).val());
+            console.log("Change number: " + number);
+            if (number == current_config[v.key]){
+                console.log("identical");
+                $(v.selector).parent().addClass('has-success');
+            } else {
+                console.log("different");
+                $(v.selector).parent().removeClass('has-success');
+            }
+        });
+
+    });
+
     stacker.attachCommandHandler("no_serial", function (command, payload){
         $('#no_serial_error').text("Not connected to a serial port. Connect to a serial port first.");
         $('#no_serial_error').show();
@@ -100,12 +101,13 @@ $( document ).ready(function() {
         $('#no_serial_error').hide();
         // we are not yet sure that we have a correct serial port.
         $('#no_version_response').show()
-        stacker.serial_get_version();;
+        stacker.serial_get_version();
     });
 
     stacker.attachCommandHandler("serial_get_version", function (command, payload){
         console.log("Successfully got version");
         $('#no_version_response').hide();
+
         var hash = payload["version"]["hash"];
         // console.log(hash.map(String.fromCharCode).join('')); // why doesnt this work??
         var hashstring = ""
@@ -126,9 +128,14 @@ $( document ).ready(function() {
     });
 
     stacker.attachCommandHandler("serial_get_config", function (command, payload) {
-        current_config["config"] = payload["config"]
+        //current_config["config"] = payload["config"]
+        var cfg = payload["config"];
+        console.log("Got config");
+        console.log(cfg);
+        console.log(stacker.flatten_config(cfg));
+        console.log(current_config);
+        $.extend(current_config, stacker.flatten_config(cfg))
         setAllElements();
-        $('#motor_min_width input').trigger("change");
     });
 
     stacker.attachCommandHandler("onopen", function (){
@@ -158,12 +165,8 @@ $( document ).ready(function() {
                     style_additives = ""
                 }
                 var entry = $('<li><a href="#" class=' + style_additives + ' >' + val.device + ' - ' + val.manufacturer +  '</a></li>');
-                $(entry).select('a').on("click", function (){
-                    // console.log( $( event.data).text() );
-                    // $.getJSON("connect_to_serial", {device:val.device}, function( data ) {
-                       // console.log(data);
-                    // });
 
+                $(entry).select('a').on("click", function (){
                     stacker.connectSerial(val.device);
                 });
                 entry.appendTo('#navbar_port_dropdown ul');
@@ -176,10 +179,11 @@ $( document ).ready(function() {
     $('#motor_config_upload').click(function (event){
         console.log(event);
         getAllElements();
-        stacker.serial_set_config(current_config["config"]);
+        stacker.serial_set_config(stacker.unflatten_config(current_config));
         stacker.serial_get_config();
         this.blur();
     });
+
     $('#motor_config_move').click(function (event){
         console.log(event);
         var steps = parseFloat($('#motor_config_move_steps').val());
@@ -187,16 +191,5 @@ $( document ).ready(function() {
         this.blur();
     });
 
-    $('#motor_min_width input').change(function () {
-        var number = parseFloat($(this).val());
-        console.log("Change number: " + number);
-        if (number == current_config.config.motor.min_width){
-            console.log("identical");
-            $('#motor_min_width').addClass('has-success');
-        } else {
-            console.log("different");
-            $('#motor_min_width').removeClass('has-success');
-        }
-    });
 
 });
