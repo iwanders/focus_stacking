@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 # The name of your project (used to name the compiled .hex file)
 TARGET = main
 
@@ -9,6 +11,8 @@ OPTIONS = -DF_CPU=96000000 -DUSB_SERIAL -DLAYOUT_US_ENGLISH -DUSING_MAKEFILE
 
 # options needed by many Arduino libraries to configure for Teensy 3.0
 OPTIONS += -D__MK20DX256__ -DARDUINO=10600 -DTEENSYDUINO=121
+
+OPTIONS += $(shell ./git_version.sh)
 
 
 # Other Makefiles and project templates for Teensy 3.x:

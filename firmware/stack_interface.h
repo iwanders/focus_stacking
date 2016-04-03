@@ -29,6 +29,23 @@
 #include "./camera_control.h"
 #include "./stack_control.h"
 
+
+#ifndef VERSION_WORKING_DIRECTORY_CHANGES_UNSTAGED
+  #define VERSION_WORKING_DIRECTORY_CHANGES_UNSTAGED 2
+#endif
+
+#ifndef VERSION_WORKING_DIRECTORY_CHANGES_STAGED
+  #define VERSION_WORKING_DIRECTORY_CHANGES_STAGED 2
+#endif
+
+// https://gcc.gnu.org/onlinedocs/cpp/Stringification.html
+#define make_xstr(s) make_str(s)
+#define make_str(s) #s
+#ifndef VERSION_GIT_HASH
+  #define VERSION_GIT_HASH "unknown"
+#endif
+
+
 /*
   The StackInterface allows for interaction with a StackControl object.
 
@@ -56,6 +73,7 @@ class StackInterface{
     action_motor = 4,
     action_camera = 5,
     action_stop = 6,
+    get_version = 7,
   };
 
   // config struct for this class.
@@ -72,6 +90,12 @@ class StackInterface{
   } msg_config_t;
 
   typedef struct {
+    uint8_t unstaged;
+    uint8_t staged;
+    uint8_t hash[41];
+  } msg_version_t;
+
+  typedef struct {
     int32_t steps;
   } msg_action_motor_t;
 
@@ -81,6 +105,7 @@ class StackInterface{
     union {
       msg_config_t config;
       msg_action_motor_t action_motor;
+      msg_version_t version;
       uint8_t raw[64 - 4];
     };
   } msg_t;

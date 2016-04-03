@@ -118,6 +118,18 @@ void StackInterface::processCommand(const msg_t* msg) {
         stack_->stop();
       break;
 
+    case get_version: {
+        char buffer[sizeof(msg_t)] = {0};
+        msg_t* response = reinterpret_cast<msg_t*>(buffer);
+        response->type = get_version;
+        response->version.unstaged = VERSION_WORKING_DIRECTORY_CHANGES_UNSTAGED;
+        response->version.staged = VERSION_WORKING_DIRECTORY_CHANGES_STAGED;
+        uint8_t hash[] = make_xstr(VERSION_GIT_HASH);
+        memcpy(&(response->version.hash), hash, sizeof(response->version.hash));
+        Serial.write(buffer, sizeof(msg_t));
+      }
+      break;
+
     default:
       SIDBGln("Got unknown command.");
   }

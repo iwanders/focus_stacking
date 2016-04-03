@@ -8,14 +8,16 @@ msg_type_t = namedtuple("msg_type", ["nop",
                                      "start_stack",
                                      "action_motor",
                                      "action_photo",
-                                     "action_stop"])
+                                     "action_stop",
+                                     "get_version"])
 msg_type = msg_type_t(*range(0, len(msg_type_t._fields)))
 # can do msg_type.nop now.
 
 # Depending on the message type, we interpret the payload as to be this field:
 msg_type_field = {msg_type_t._fields.index("set_config"): "config",
                   msg_type_t._fields.index("get_config"): "config",
-                  msg_type_t._fields.index("action_motor"): "action_motor"}
+                  msg_type_t._fields.index("action_motor"): "action_motor",
+                  msg_type_t._fields.index("get_version"): "version"}
 
 # Reverse lookup for msg type, that is id->name
 msg_type_lookup = dict((v, k) for v, k in list(enumerate(msg_type_t._fields)))
@@ -84,6 +86,19 @@ class MsgConfig(ctypes.LittleEndianStructure, Dictionary):
                 ("stack", ConfigStackControl),
                 ("interface", ConfigStackInterface)]
 
+class MsgVersion(ctypes.LittleEndianStructure, Dictionary):
+    _fields_ = [("unstaged", ctypes.c_byte),
+                ("staged", ctypes.c_byte),
+                ("hash", ctypes.c_byte * (41))]
+
+    def __iter__(self):
+        for k, t in self._fields_:                
+            if (issubclass(t, ctypes.Structure)):
+                yield (k, dict(getattr(self, k)))
+            elif (k == "hash"):
+                yield (k, [a for a in getattr(self, k)])
+            else:
+                yield (k, getattr(self, k))
 
 class ActionMotor(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("steps", ctypes.c_int)]
@@ -92,6 +107,7 @@ class ActionMotor(ctypes.LittleEndianStructure, Dictionary):
 class _MsgBody(ctypes.Union):
     _fields_ = [("config", MsgConfig),
                 ("action_motor", ActionMotor),
+                ("version", MsgVersion),
                 ("raw", ctypes.c_byte * (64-4))]
 
 
