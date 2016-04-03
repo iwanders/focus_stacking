@@ -15,6 +15,7 @@ import message
 
 logger = logging.getLogger(__name__)
 
+
 class StackInterface(threading.Thread):
     def __init__(self, packet_size=64):
         super().__init__()
@@ -71,7 +72,7 @@ class StackInterface(threading.Thread):
             pass  # there was no data there.
             return
 
-        if (self.ser == None):
+        if (self.ser is None):
             logging.warn("Trying to send on a closed serial port.")
 
         try:
@@ -96,6 +97,9 @@ class StackInterface(threading.Thread):
     def is_serial_connected(self):
         return True if (self.ser is not None) and (
                                     self.ser.isOpen()) else False
+
+    def get_serial_parameters(self):
+        return {"device":self.ser.port, "baudrate":self.ser.baudrate}
 
     # adds a message to the to be sent queue. (to serial)
     def put_message(self, message):

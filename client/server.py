@@ -26,12 +26,6 @@ class FocusStackRoot:
     def get_serial_ports(self):
         return interface.get_potential_ports()
 
-    @cherrypy.expose
-    @cherrypy.tools.json_out()
-    def connect_to_serial(self, device):
-        result = self.stack.connect(device)
-        return {"result": result}
-
 
 class WebsocketHandler(ws4py.websocket.WebSocket):
 
@@ -44,23 +38,37 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
         decoded_json = json.loads(str(msg))
         msgtype, msgdata = decoded_json
 
+        print(msg)
+
         if (msgtype == "serial"):
             # check if we have a serial connection.
             if (not self.stacker.is_serial_connected()):
                 self.send(json.dumps(json.dumps(["no_serial"])))
                 return
 
+            # convert the JSON into a message and put it.
             msg = message.Msg()
             msg.from_dict(msgdata)
-            print(msg)
             data = msg
             self.stacker.put_message(data)
 
         if (msgtype == "connect_serial"):
             res = self.stacker.connect(msgdata["device"])
-            msgdata["result"] = res
-            response = ["connect_serial", msgdata]
-            self.manager.broadcast(json.dumps(response))
+            if (res):
+                response = ["connect_success",
+                            self.stacker.get_serial_parameters()]
+                self.manager.broadcast(json.dumps(response))
+            else:
+                response = ["connect_fail", msgdata]
+                self.send(json.dumps(response))
+
+        if (msgtype == "get_serial_status"):
+            if (not self.stacker.is_serial_connected()):
+                self.send(json.dumps(json.dumps(["no_serial"])))
+            else:
+                response = ["connect_success",
+                            self.stacker.get_serial_parameters()]
+                self.send(json.dumps(response))
 
     def closed(self, code, reason=None):
         print("Websocket was closed.")
@@ -83,12 +91,12 @@ if __name__ == "__main__":
 
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(name)s - %(asctime)s - %(levelname)s'
+                                  ' - %(message)s')
     # add formatter to ch
     ch.setFormatter(formatter)
     # add ch to logger
     interface_logger.addHandler(ch)
-
 
     # Add the websocket requirements.
     cherrypy.tools.websocket = WebSocketTool()

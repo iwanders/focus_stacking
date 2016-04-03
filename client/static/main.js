@@ -2,18 +2,28 @@ var Stack = function () {
 };
 
 Stack.prototype.open = function(address){
+    var self = this;
     try {
         this.socket = new WebSocket("ws://" + address);
-        this.socket.onclose = this.onclose;
-        this.socket.onopen = this.onopen;
-        this.socket.onmessage = this.onmessage;
+        this.socket.onclose = function(){
+            Stack.prototype.onclose.call(self);
+        };
+        this.socket.onopen = function(){
+            Stack.prototype.onopen.call(self);
+        };
+        this.socket.onmessage = function(msg){
+            Stack.prototype.onmessage.call(self, msg);
+        };
     } catch(exception){
         console.log("Failure: " + exception);
     }
 }
 
 Stack.prototype.send = function(msgtype, data) {
-    if (this.socket.connected == true) {
+    console.log("In send");
+    console.log(this);
+    if (this.connected == true) {
+        console.log("Sending");
         this.socket.send(JSON.stringify([msgtype, data]));
         console.log(JSON.stringify([msgtype, data]));
     } else {
@@ -26,10 +36,14 @@ Stack.prototype.onclose = function() {
     this.connected = false;
 };
 Stack.prototype.onopen = function() {
-    console.log("onopen");
+    console.log("onopen:");
+    console.log(this);
     this.connected = true;
+    Stack.prototype.get_serial_status.call(this);
 };
 Stack.prototype.onmessage = function(msg) {
+    console.log("onmessage this:")
+    console.log(this);
     console.log("onmessage" + msg.data);
 };
 
@@ -38,7 +52,15 @@ Stack.prototype.connect_serial = function (device) {
 }
 
 Stack.prototype.test = function(){
+    console.log("in test");
+    console.log(this);
     this.send("serial", {'msg_type':2});
+}
+
+Stack.prototype.get_serial_status = function(){
+    console.log("In get_serial_status");
+    console.log(this);
+    this.send("get_serial_status", "");
 }
 
 var stacker = new Stack();
