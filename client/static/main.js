@@ -61,13 +61,18 @@ Stack.prototype.onclose = function() {
 Stack.prototype.onopen = function() {
     this.connected = true;
     this.dispatchers.onopen();
-    Stack.prototype.get_serial_status.call(this);
+    Stack.prototype.getSerialStatus.call(this);
 };
 Stack.prototype.onmessage = function(msg) {
     decoded = $.parseJSON(msg.data);
     var command = decoded[0];
     var payload = decoded[1];
 
+    if (command == "serial"){
+        console.log("Serial command");
+        console.log(payload);
+        return;
+    }
     // try to dispatch registered functions
     if (command in this.dispatchers) {
         this.dispatchers[command](command, payload);
@@ -76,11 +81,11 @@ Stack.prototype.onmessage = function(msg) {
     }
 };
 
-Stack.prototype.connect_serial = function (device) {
+Stack.prototype.connectSerial = function (device) {
     this.send("connect_serial", {device:device});
 }
 
-Stack.prototype.get_serial_status = function(){
+Stack.prototype.getSerialStatus = function(){
     this.send("get_serial_status", "");
 }
 
@@ -104,8 +109,11 @@ $( document ).ready(function() {
     });
 
     stacker.attachCommandHandler("connect_success", function (command, payload){
+        console.log("Successfully got serial");
         $('#no_serial_error').hide();
+        // we are not yet sure that we have a correct serial port.
     });
+
     stacker.attachCommandHandler("connect_fail", function (command, payload){
         $('#no_serial_error').text("Could not connect to \"" + payload["device"] + "\", do you have the permission to do so?");
         $('#no_serial_error').show();
@@ -144,7 +152,7 @@ $( document ).ready(function() {
                        // console.log(data);
                     // });
 
-                    stacker.connect_serial(val.device);
+                    stacker.connectSerial(val.device);
                 });
                 entry.appendTo('#navbar_port_dropdown ul');
             });

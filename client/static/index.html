@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>Bootstrap 101 Template</title>
+    <title>Focus Stacking Interface</title>
 
     <link href="dependencies/bootstrap-3.3.6-dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="customization.css" rel="stylesheet">
@@ -16,12 +16,12 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
-            <a href="https://github.com/iwanders/focus_stacking" class="navbar-brand">Focus Stacking</a>
+            <a href="https://github.com/iwanders/focus_stacking" class="navbar-brand" data-toggle="modal" data-target="#information" onclick="$('#information').show();">Focus Stacking</a>
         </div>
 
         <ul class="nav navbar-nav">
-            <li><a href="#" id="navbar_status">Status</a></li>
-            <li><a href="#" data-toggle="modal" data-target="#settings" onclick="console.log('show settings');">Settings</a></li>
+            <!-- <li><a href="#" id="navbar_status">Status</a></li> -->
+            <li><a href="#" data-toggle="modal" data-target="#settings" onclick="$('#settings').show();">Settings</a></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
@@ -38,15 +38,144 @@
 
     <div class="container">
 
+
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="information">
+          <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Information</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        The source code of this project is available here: <a href="https://github.com/iwanders/focus_stacking">https://github.com/iwanders/focus_stacking</a>.
+                    </p>
+                    <p>
+                        Running firmware version: <span id="firmware_version">unknown</span>
+                    </p>
+                </div> <!-- modal body -->
+            </div>
+        </div>
+        </div>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="settings">
+          <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Settings</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    This panel holds settings which are not often changed.
+                </p>
+
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Transmission ratio</div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <p class="setting_description">
+                                    In this interface the motor movements are expressed in degrees. The motor and firmware uses the number of steps made by the stepper driver. This parameter sets the conversion ratio between the two.
+                                    <div class="input-group">
+                                        <span class="input-group-addon">transmission_ratio</span>
+                                        <input type="text" class="form-control" id="transmission_ratio">
+                                        <span class="input-group-addon">steps / degree</span>
+                                    </div>
+                                </p>
+                            </div>
+                        </div>
+                    </div> <!-- end panel -->
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Motor</div>
+                    <div class="panel-body">
+                        <!-- <p>Configures the motor parameters.</p> -->
+
+                        <div class="form-group">
+                            <p class="setting_description">
+                                The motor min_width field determines the minimum duration between step pulses. If this value is lower, the maximum speed of the motor will be higher.
+                                <div class="input-group">
+                                    <span class="input-group-addon">min_width</span>
+                                    <input type="text" class="form-control" id="motor_min_width">
+                                    <span class="input-group-addon">ms</span>
+                                </div>
+                            </p>
+                            <p class="setting_description">
+                                The motor max_width field determines the maximum duration between step pulses. If this value is higher, the motor will start at a slower speed.
+                                <div class="input-group">
+                                    <span class="input-group-addon">max_width</span>
+                                    <input type="text" class="form-control" id="motor_max_width">
+                                    <span class="input-group-addon">ms</span>
+                                </div>
+                            </p>
+
+                            <p class="setting_description">
+                                The motor ramps up the speed by using a linear profile to change the duration between the step pulses from max_width to min_width. The ramp_length parameter determines how many steps are taken to make this transition.
+                                <div class="input-group">
+                                    <span class="input-group-addon">ramp_length</span>
+                                    <input type="text" class="form-control" id="motor_ramp_length">
+                                    <span class="input-group-addon">steps</span>
+                                </div>
+                            </p>
+                        </div>
+                        <p><a href="#" class="btn btn-primary" role="button">Test</a></p>
+                    </div>
+                </div> <!-- end panel -->
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Camera</div>
+                    <div class="panel-body">
+                        <!-- <p>Configures the camera parameters.</p>-->
+
+                        <div class="form-group">
+                            <p class="setting_description">
+                                When a photo is to be made, the trigger button is first 'pressed' to the focus stage for a duration of focus_duration.
+                                <div class="input-group">
+                                    <span class="input-group-addon">focus_duration</span>
+                                    <input type="text" class="form-control" id="camera_focus_duration">
+                                    <span class="input-group-addon">ms</span>
+                                </div>
+                            </p>
+                            <p class="setting_description">
+                                After the trigger button has been held at the focus stage, the button the 'shutter' stage of the button is kept pressed for the shutter_duration.
+                                <div class="input-group">
+                                    <span class="input-group-addon">shutter_duration</span>
+                                    <input type="text" class="form-control" id="camera_shutter_duration">
+                                    <span class="input-group-addon">ms</span>
+                                </div>
+                            </p>
+
+                        </div>
+                        <p>
+                            <button id="test_camera" type="button" class="btn btn-default">
+                              <span class="glyphicon glyphicon-camera"></span> Take Photo
+                            </button>
+                        </p>
+                    </div>
+                </div> <!-- end panel -->
+
+            </div> <!-- modal body -->
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary">Upload</button> -->
+            </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+
         <div id="no_websocket_error" class="alert alert-danger" role="alert" style="display: none;">
-            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
             <span class="sr-only">Error:</span>
             Could not connect to the websocket... Did the server crash?
         </div>
 
 
         <div id="no_serial_error" class="alert alert-danger" role="alert" style="display: none;">
-            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
             <span class="sr-only">Error:</span>
         </div>
 
@@ -60,4 +189,3 @@
     <script src="main.js"></script>
   </body>
 </html>
-        

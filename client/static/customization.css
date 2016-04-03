@@ -3,3 +3,7 @@
 body {
 	padding-top: 70px;
 }
+
+.setting_description {
+	color: gray;
+}
