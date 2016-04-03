@@ -4,7 +4,15 @@ var Stack = function () {
         fallback: function(command, payload){
             console.log("Unhandled command: " + command + " payload:");
             console.log(payload);
-        }
+        },
+        
+        onopen: function(){
+            console.log("Websocket open");
+        },
+        onclose: function(){
+            console.log("Websocket closed");
+        },
+        
     };
 };
 
@@ -44,6 +52,7 @@ Stack.prototype.send = function(msgtype, data) {
 Stack.prototype.onclose = function() {
     this.connected = false;
     var self = this;
+    this.dispatchers.onclose();
     // try to reconnect.
     setTimeout(function() {
       self.reconnect();
@@ -51,6 +60,7 @@ Stack.prototype.onclose = function() {
 };
 Stack.prototype.onopen = function() {
     this.connected = true;
+    this.dispatchers.onopen();
     Stack.prototype.get_serial_status.call(this);
 };
 Stack.prototype.onmessage = function(msg) {
@@ -85,17 +95,28 @@ var stacker = new Stack();
 */
 $( document ).ready(function() {
     console.log( "ready!" );
-
     stacker.open($(location).attr('host') + "/ws");
 
     stacker.attachCommandHandler("no_serial", function (command, payload){
-        console.log("no_serial handler");
-        console.log(payload);
+        $('#no_serial_error').text("Not connected to a serial port. Connect to a serial port first.");
+        $('#no_serial_error').show();
+        
     });
 
     stacker.attachCommandHandler("connect_success", function (command, payload){
-        console.log("connect_success handler");
-        console.log(payload);
+        $('#no_serial_error').hide();
+    });
+    stacker.attachCommandHandler("connect_fail", function (command, payload){
+        $('#no_serial_error').text("Could not connect to \"" + payload["device"] + "\", do you have the permission to do so?");
+        $('#no_serial_error').show();
+    });
+
+    stacker.attachCommandHandler("onopen", function (){
+        $('#no_websocket_error').hide();
+    });
+
+    stacker.attachCommandHandler("onclose", function (){
+        $('#no_websocket_error').show();
     });
 
     // Deal with the dropdown
@@ -116,7 +137,7 @@ $( document ).ready(function() {
                 } else {
                     style_additives = ""
                 }
-                var entry = $('<li><a href="#" class=' + style_additives + ' data-device="' + val.device + '">' + val.device + ' - ' + val.manufacturer +  '</a></li>');
+                var entry = $('<li><a href="#" class=' + style_additives + ' >' + val.device + ' - ' + val.manufacturer +  '</a></li>');
                 $(entry).select('a').on("click", function (){
                     // console.log( $( event.data).text() );
                     // $.getJSON("connect_to_serial", {device:val.device}, function( data ) {
