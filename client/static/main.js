@@ -70,8 +70,8 @@ Stack.prototype.onmessage = function(msg) {
 
     var command;
     if (commandtype == "serial"){
-        console.log("Serial command");
-        console.log(payload);
+        // console.log("Serial command");
+        // console.log(payload);
         command = "serial_" + payload["msg_type"]
     } else {
         command = commandtype
@@ -96,14 +96,40 @@ Stack.prototype.attachCommandHandler = function (command, fun){
     this.dispatchers[command] = fun;
 }
 
+// commands starting with serial_ are in underscore naming convention
+// so that they are clearly distinguishable.
 Stack.prototype.serial_get_version = function(){
     this.send("serial", {"msg_type":"get_version"});
 }
+
+Stack.prototype.serial_get_config = function(){
+    this.send("serial", {"msg_type":"get_config"});
+}
+
+
+
 var stacker = new Stack();
 
 /*
     Attach hooks and do stuff...
 */
+
+/*
+    On page reade we do the following:
+        connect to the websocket. 
+            - If this fails, display a noticed.
+            - If this is successful, remove notice.
+        When the websocket is open, we obtain the serial status.
+            - If no_serial was obtained; display notice.
+            - If a serial port was available, connect_success is sent from the server.
+        If connect_success is received:
+            - display a warning that the version retrieval is taking long.
+            - try to obtain the version
+        If the version if obtained:
+            - remove the version warning, we are finally good to go.
+            - sent a get_config command to retrieve the config.
+*/
+
 $( document ).ready(function() {
     console.log( "ready!" );
     stacker.open($(location).attr('host') + "/ws");
@@ -114,12 +140,17 @@ $( document ).ready(function() {
         
     });
 
+    stacker.attachCommandHandler("connect_fail", function (command, payload){
+        $('#no_serial_error').text("Could not connect to \"" + payload["device"] + "\", do you have the permission to do so?");
+        $('#no_serial_error').show();
+    });
+
     stacker.attachCommandHandler("connect_success", function (command, payload){
         console.log("Successfully got serial");
         $('#no_serial_error').hide();
         // we are not yet sure that we have a correct serial port.
-        stacker.serial_get_version();
-        $('#no_version_response').show();
+        $('#no_version_response').show()
+        stacker.serial_get_version();;
     });
 
     stacker.attachCommandHandler("serial_get_version", function (command, payload){
@@ -140,12 +171,18 @@ $( document ).ready(function() {
             hashstring += "<br /> Repo Unstaged: " + lookup[payload["version"]["unstaged"]];
         }
         $('#firmware_version').html(hashstring);
+
+        stacker.serial_get_config();
     });
 
-    stacker.attachCommandHandler("connect_fail", function (command, payload){
-        $('#no_serial_error').text("Could not connect to \"" + payload["device"] + "\", do you have the permission to do so?");
-        $('#no_serial_error').show();
+    stacker.attachCommandHandler("serial_get_config", function (command, payload) {
+        var config = payload["config"];
+        var motor = config["motor"];
+        var camera = config["camera"];
+        var stack = config["stack"];
+        var interface = config["interface"];
     });
+
 
     stacker.attachCommandHandler("onopen", function (){
         $('#no_websocket_error').hide();
