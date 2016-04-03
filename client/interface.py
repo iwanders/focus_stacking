@@ -60,7 +60,7 @@ class StackInterface(threading.Thread):
                     self.rx.put_nowait(msg)
                 else:
                     logging.warn("Received incomplete packet, discarded.")
-        except serial.SerialException as e:
+        except (serial.SerialException, OSError) as e:
             self.ser.close()
             self.ser = None
 
