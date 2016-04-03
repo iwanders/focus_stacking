@@ -45,6 +45,8 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
             if (not self.stacker.is_serial_connected()):
                 self.send(json.dumps(json.dumps(["no_serial"])))
                 return
+            if (isinstance(msgdata["msg_type"], str)):
+                msgdata["msg_type"] = message.msg_type_id[msgdata["msg_type"]]
 
             # convert the JSON into a message and put it.
             msg = message.Msg()
@@ -113,7 +115,9 @@ if __name__ == "__main__":
     def broadcaster():
         m = stack_interface.get_message()
         if m:
-            msg = ["serial", dict(m)]
+            payload = dict(m)
+            payload["msg_type"] = message.msg_type_name[payload["msg_type"]]
+            msg = ["serial", payload]
             a.manager.broadcast(json.dumps(msg))
 
     # use this very fancy cherrypy monitor to run our broadcaster.

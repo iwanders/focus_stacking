@@ -16,7 +16,7 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
-            <a href="https://github.com/iwanders/focus_stacking" class="navbar-brand" data-toggle="modal" data-target="#information" onclick="$('#information').show();">Focus Stacking</a>
+            <a href="#" class="navbar-brand" data-toggle="modal" data-target="#information" onclick="$('#information').show();">Focus Stacking</a>
         </div>
 
         <ul class="nav navbar-nav">
@@ -49,7 +49,7 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        The source code of this project is available here: <a href="https://github.com/iwanders/focus_stacking">https://github.com/iwanders/focus_stacking</a>.
+                        The newest source code of this project is available here: <a href="https://github.com/iwanders/focus_stacking">https://github.com/iwanders/focus_stacking</a>.
                     </p>
                     <p>
                         Running firmware version: <span id="firmware_version">unknown</span>
@@ -177,6 +177,12 @@
         <div id="no_serial_error" class="alert alert-danger" role="alert" style="display: none;">
             <span class="glyphicon glyphicon-exclamation-sign"></span>
             <span class="sr-only">Error:</span>
+        </div>
+
+        <div id="no_version_response" class="alert alert-danger" role="alert" style="display: none;">
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            <span class="sr-only">Error:</span>
+            The firmware version could not be retrieved... Is this the right serial port?
         </div>
 
 

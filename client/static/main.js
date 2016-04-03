@@ -65,13 +65,16 @@ Stack.prototype.onopen = function() {
 };
 Stack.prototype.onmessage = function(msg) {
     decoded = $.parseJSON(msg.data);
-    var command = decoded[0];
+    var commandtype = decoded[0];
     var payload = decoded[1];
 
-    if (command == "serial"){
+    var command;
+    if (commandtype == "serial"){
         console.log("Serial command");
         console.log(payload);
-        return;
+        command = "serial_" + payload["msg_type"]
+    } else {
+        command = commandtype
     }
     // try to dispatch registered functions
     if (command in this.dispatchers) {
@@ -93,6 +96,9 @@ Stack.prototype.attachCommandHandler = function (command, fun){
     this.dispatchers[command] = fun;
 }
 
+Stack.prototype.serial_get_version = function(){
+    this.send("serial", {"msg_type":"get_version"});
+}
 var stacker = new Stack();
 
 /*
@@ -112,6 +118,28 @@ $( document ).ready(function() {
         console.log("Successfully got serial");
         $('#no_serial_error').hide();
         // we are not yet sure that we have a correct serial port.
+        stacker.serial_get_version();
+        $('#no_version_response').show();
+    });
+
+    stacker.attachCommandHandler("serial_get_version", function (command, payload){
+        console.log("Successfully got version");
+        $('#no_version_response').hide();
+        var hash = payload["version"]["hash"];
+        // console.log(hash.map(String.fromCharCode).join('')); // why doesnt this work??
+        var hashstring = ""
+        for (var i = 0; i < hash.length; i++) {
+            hashstring += String.fromCharCode(hash[i]);
+            //Do something
+        }
+        var lookup = {0: "clean", 1:"dirty", 2:"unknown"}
+        if (payload["version"]["staged"] != 0) {
+            hashstring += "<br /> Repo Staged: " + lookup[payload["version"]["staged"]];
+        }
+        if (payload["version"]["unstaged"] != 0) {
+            hashstring += "<br /> Repo Unstaged: " + lookup[payload["version"]["unstaged"]];
+        }
+        $('#firmware_version').html(hashstring);
     });
 
     stacker.attachCommandHandler("connect_fail", function (command, payload){

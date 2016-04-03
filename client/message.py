@@ -20,7 +20,10 @@ msg_type_field = {msg_type_t._fields.index("set_config"): "config",
                   msg_type_t._fields.index("get_version"): "version"}
 
 # Reverse lookup for msg type, that is id->name
-msg_type_lookup = dict((v, k) for v, k in list(enumerate(msg_type_t._fields)))
+msg_type_name = dict(enumerate(msg_type_t._fields))
+
+# Reverse lookup for msg type, that is name->id
+msg_type_id = dict((k, v) for v, k in enumerate(msg_type_t._fields))
 
 
 # Convenience mixin to allow construction of struct from a byte like object.
@@ -126,9 +129,9 @@ class Msg(ctypes.LittleEndianStructure, Readable):
     def __str__(self):
         if (self.msg_type in msg_type_field):
             payload_text = str(getattr(self, msg_type_field[self.msg_type]))
-            message_field = msg_type_lookup[self.msg_type]
+            message_field = msg_type_name[self.msg_type]
         else:
-            message_field = msg_type_lookup[self.msg_type]
+            message_field = msg_type_name[self.msg_type]
             payload_text = "-"
         return "<Msg {}: {}>".format(message_field, payload_text)
 

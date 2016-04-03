@@ -147,8 +147,8 @@ if __name__ == "__main__":
 
     subparsers = parser.add_subparsers(dest="command")
 
-    for i in range(0, len(message.msg_type_lookup)):
-        command = message.msg_type_lookup[i]
+    for i in range(0, len(message.msg_type_name)):
+        command = message.msg_type_name[i]
         command_parser = subparsers.add_parser(command)
         if (command.startswith("set_") or command.startswith("action_")):
             if (i in message.msg_type_field):
