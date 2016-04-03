@@ -13,6 +13,7 @@ import queue
 
 import message
 
+logger = logging.getLogger(__name__)
 
 class StackInterface(threading.Thread):
     def __init__(self, packet_size=64):
@@ -33,10 +34,10 @@ class StackInterface(threading.Thread):
                                      baudrate=baudrate,
                                      timeout=packet_read_timeout,
                                      **kwargs)
-            logging.debug("Succesfully connected to {}.".format(serial_port))
+            logger.debug("Succesfully connected to {}.".format(serial_port))
             return True
         except serial.SerialException as e:
-            logging.warn("Failed to connect to {}".format(serial_port))
+            logger.warn("Failed to connect to {}".format(serial_port))
             return False
 
     def stop(self):
@@ -70,8 +71,11 @@ class StackInterface(threading.Thread):
             pass  # there was no data there.
             return
 
+        if (self.ser == None):
+            logging.warn("Trying to send on a closed serial port.")
+
         try:
-            print("Processing {}".format(msg))
+            logger.debug("Processing {}".format(msg))
             self.ser.write(bytes(msg))
         except serial.SerialException:
             self.ser.close()
@@ -89,10 +93,15 @@ class StackInterface(threading.Thread):
                 continue
             self.process_rx()  # read from serial port
 
+    def is_serial_connected(self):
+        return True if (self.ser is not None) and (
+                                    self.ser.isOpen()) else False
+
+    # adds a message to the to be sent queue. (to serial)
     def put_message(self, message):
         self.tx.put_nowait(message)
 
-    # try to get a message from the rx queue
+    # try to get a message from the received queue. (from serial)
     def get_message(self):
         try:
             msg = self.rx.get_nowait()

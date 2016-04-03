@@ -2,6 +2,7 @@
 
 import cherrypy
 import os
+import logging
 import json
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.manager import WebSocketManager
@@ -34,16 +35,21 @@ class FocusStackRoot:
 
 class WebsocketHandler(ws4py.websocket.WebSocket):
 
-    def __init__(self, stack_interface, *args, **kwargs):
+    def __init__(self, stack_interface, websocket_manager, *args, **kwargs):
         super(WebsocketHandler, self).__init__(*args, **kwargs)
-        cherrypy.log("Test")
         self.stacker = stack_interface
+        self.manager = websocket_manager
 
     def received_message(self, msg):
         decoded_json = json.loads(str(msg))
         msgtype, msgdata = decoded_json
 
         if (msgtype == "serial"):
+            # check if we have a serial connection.
+            if (not self.stacker.is_serial_connected()):
+                self.send(json.dumps(json.dumps(["no_serial"])))
+                return
+
             msg = message.Msg()
             msg.from_dict(msgdata)
             print(msg)
@@ -51,7 +57,10 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
             self.stacker.put_message(data)
 
         if (msgtype == "connect_serial"):
-            self.stacker.connect(msgdata["device"])
+            res = self.stacker.connect(msgdata["device"])
+            msgdata["result"] = res
+            response = ["connect_serial", msgdata]
+            self.manager.broadcast(json.dumps(response))
 
     def closed(self, code, reason=None):
         print("Websocket was closed.")
@@ -61,14 +70,25 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
         print("Socket shutdown")
 
     @classmethod
-    def with_callback(cls, stack_instance):
+    def with_parameters(cls, stack_instance, manager):
         def factory(*args, **kwargs):
-            z = cls(stack_instance, *args, **kwargs)
+            z = cls(stack_instance, manager, *args, **kwargs)
             return z
         return factory
 
 
 if __name__ == "__main__":
+    interface_logger = logging.getLogger("interface")
+    interface_logger.setLevel(logging.DEBUG)
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # add formatter to ch
+    ch.setFormatter(formatter)
+    # add ch to logger
+    interface_logger.addHandler(ch)
+
 
     # Add the websocket requirements.
     cherrypy.tools.websocket = WebSocketTool()
@@ -86,7 +106,7 @@ if __name__ == "__main__":
         m = stack_interface.get_message()
         if m:
             msg = ["serial", dict(m)]
-            a.broadcast(json.dumps(msg))
+            a.manager.broadcast(json.dumps(msg))
 
     # use this very fancy cherrypy monitor to run our broadcaster.
     cherrypy.process.plugins.Monitor(cherrypy.engine,
@@ -106,6 +126,7 @@ if __name__ == "__main__":
                     "tools.staticdir.index": "index.html"},
               "/ws": {"tools.websocket.on": True,
                       "tools.websocket.handler_cls":
-                      WebsocketHandler.with_callback(stack_interface)}
+                      WebsocketHandler.with_parameters(stack_interface,
+                                                       a.manager)}
               }
     cherrypy.quickstart(server_tree, '/', config=config)
