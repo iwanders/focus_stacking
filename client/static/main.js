@@ -1,8 +1,16 @@
 var Stack = function () {
+    this.connected = false;
+    this.dispatchers = {
+        fallback: function(command, payload){
+            console.log("Unhandled command: " + command + " payload:");
+            console.log(payload);
+        }
+    };
 };
 
 Stack.prototype.open = function(address){
     var self = this;
+    this.address = address;
     try {
         this.socket = new WebSocket("ws://" + address);
         this.socket.onclose = function(){
@@ -19,9 +27,11 @@ Stack.prototype.open = function(address){
     }
 }
 
+Stack.prototype.reconnect = function(){
+    this.open(this.address);
+}
+
 Stack.prototype.send = function(msgtype, data) {
-    console.log("In send");
-    console.log(this);
     if (this.connected == true) {
         console.log("Sending");
         this.socket.send(JSON.stringify([msgtype, data]));
@@ -32,35 +42,40 @@ Stack.prototype.send = function(msgtype, data) {
 };
 
 Stack.prototype.onclose = function() {
-    console.log("closing");
     this.connected = false;
+    var self = this;
+    // try to reconnect.
+    setTimeout(function() {
+      self.reconnect();
+    }, 1000)
 };
 Stack.prototype.onopen = function() {
-    console.log("onopen:");
-    console.log(this);
     this.connected = true;
     Stack.prototype.get_serial_status.call(this);
 };
 Stack.prototype.onmessage = function(msg) {
-    console.log("onmessage this:")
-    console.log(this);
-    console.log("onmessage" + msg.data);
+    decoded = $.parseJSON(msg.data);
+    var command = decoded[0];
+    var payload = decoded[1];
+
+    // try to dispatch registered functions
+    if (command in this.dispatchers) {
+        this.dispatchers[command](command, payload);
+    } else {
+        this.dispatchers.fallback(command, payload);
+    }
 };
 
 Stack.prototype.connect_serial = function (device) {
     this.send("connect_serial", {device:device});
 }
 
-Stack.prototype.test = function(){
-    console.log("in test");
-    console.log(this);
-    this.send("serial", {'msg_type':2});
+Stack.prototype.get_serial_status = function(){
+    this.send("get_serial_status", "");
 }
 
-Stack.prototype.get_serial_status = function(){
-    console.log("In get_serial_status");
-    console.log(this);
-    this.send("get_serial_status", "");
+Stack.prototype.attachCommandHandler = function (command, fun){
+    this.dispatchers[command] = fun;
 }
 
 var stacker = new Stack();
@@ -72,6 +87,16 @@ $( document ).ready(function() {
     console.log( "ready!" );
 
     stacker.open($(location).attr('host') + "/ws");
+
+    stacker.attachCommandHandler("no_serial", function (command, payload){
+        console.log("no_serial handler");
+        console.log(payload);
+    });
+
+    stacker.attachCommandHandler("connect_success", function (command, payload){
+        console.log("connect_success handler");
+        console.log(payload);
+    });
 
     // Deal with the dropdown
     $('#navbar_port_dropdown').bind("show.bs.dropdown", function (){

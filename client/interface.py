@@ -99,7 +99,7 @@ class StackInterface(threading.Thread):
                                     self.ser.isOpen()) else False
 
     def get_serial_parameters(self):
-        return {"device":self.ser.port, "baudrate":self.ser.baudrate}
+        return {"device": self.ser.port, "baudrate": self.ser.baudrate}
 
     # adds a message to the to be sent queue. (to serial)
     def put_message(self, message):

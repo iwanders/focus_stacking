@@ -64,7 +64,7 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
 
         if (msgtype == "get_serial_status"):
             if (not self.stacker.is_serial_connected()):
-                self.send(json.dumps(json.dumps(["no_serial"])))
+                self.send(json.dumps(["no_serial"]))
             else:
                 response = ["connect_success",
                             self.stacker.get_serial_parameters()]
@@ -86,6 +86,8 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
 
 
 if __name__ == "__main__":
+
+    # set up the interface logger.
     interface_logger = logging.getLogger("interface")
     interface_logger.setLevel(logging.DEBUG)
 
@@ -93,9 +95,7 @@ if __name__ == "__main__":
     ch.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(name)s - %(asctime)s - %(levelname)s'
                                   ' - %(message)s')
-    # add formatter to ch
     ch.setFormatter(formatter)
-    # add ch to logger
     interface_logger.addHandler(ch)
 
     # Add the websocket requirements.
