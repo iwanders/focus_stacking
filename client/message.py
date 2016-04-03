@@ -49,6 +49,11 @@ class Dictionary:
                 v = t()
                 v.from_dict(set_value)
                 setattr(self, k, v)
+            elif (isinstance(set_value, list)):
+                v = getattr(self, k)
+                for j in range(0, len(set_value)):
+                    v[j] = set_value[j]
+                setattr(self, k, v)
             else:
                 setattr(self, k, set_value)
 
