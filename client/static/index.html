@@ -80,7 +80,7 @@
                                     In this interface the motor movements are expressed in degrees. The motor and firmware uses the number of steps made by the stepper driver. This parameter sets the conversion ratio between the two.
                                     <div class="input-group">
                                         <span class="input-group-addon">transmission_ratio</span>
-                                        <input type="text" class="form-control" id="transmission_ratio">
+                                        <input type="number" class="form-control" id="transmission_ratio">
                                         <span class="input-group-addon">steps / degree</span>
                                     </div>
                                 </p>
@@ -98,7 +98,7 @@
                                 The motor min_width field determines the minimum duration between step pulses. If this value is lower, the maximum speed of the motor will be higher.
                                 <div class="input-group">
                                     <span class="input-group-addon">min_width</span>
-                                    <input type="text" class="form-control" id="motor_min_width">
+                                    <input type="number" class="form-control" id="motor_min_width">
                                     <span class="input-group-addon">ms</span>
                                 </div>
                             </p>
@@ -106,7 +106,7 @@
                                 The motor max_width field determines the maximum duration between step pulses. If this value is higher, the motor will start at a slower speed.
                                 <div class="input-group">
                                     <span class="input-group-addon">max_width</span>
-                                    <input type="text" class="form-control" id="motor_max_width">
+                                    <input type="number" class="form-control" id="motor_max_width">
                                     <span class="input-group-addon">ms</span>
                                 </div>
                             </p>
@@ -115,7 +115,7 @@
                                 The motor ramps up the speed by using a linear profile to change the duration between the step pulses from max_width to min_width. The ramp_length parameter determines how many steps are taken to make this transition.
                                 <div class="input-group">
                                     <span class="input-group-addon">ramp_length</span>
-                                    <input type="text" class="form-control" id="motor_ramp_length">
+                                    <input type="number" class="form-control" id="motor_ramp_length">
                                     <span class="input-group-addon">steps</span>
                                 </div>
                             </p>
@@ -134,7 +134,7 @@
                                 When a photo is to be made, the trigger button is first 'pressed' to the focus stage for a duration of focus_duration.
                                 <div class="input-group">
                                     <span class="input-group-addon">focus_duration</span>
-                                    <input type="text" class="form-control" id="camera_focus_duration">
+                                    <input type="number" class="form-control" id="camera_focus_duration">
                                     <span class="input-group-addon">ms</span>
                                 </div>
                             </p>
@@ -142,7 +142,7 @@
                                 After the trigger button has been held at the focus stage, the button the 'shutter' stage of the button is kept pressed for the shutter_duration.
                                 <div class="input-group">
                                     <span class="input-group-addon">shutter_duration</span>
-                                    <input type="text" class="form-control" id="camera_shutter_duration">
+                                    <input type="number" class="form-control" id="camera_shutter_duration">
                                     <span class="input-group-addon">ms</span>
                                 </div>
                             </p>
@@ -192,6 +192,7 @@
     <script src="dependencies/jquery-2.2.2.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="dependencies/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+    <script src="stack.js"></script>
     <script src="main.js"></script>
   </body>
 </html>
