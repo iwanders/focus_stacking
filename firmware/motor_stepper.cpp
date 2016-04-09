@@ -38,17 +38,19 @@ uint32_t MotorStepper::calcDelay(uint32_t step) {
     // first half of motion
     if (step < ramp_length_) {
       // in ramp part
-      return map(step, 0, ramp_length_, max_width_, min_width_);
+      return map(step, 0, min(step_goal_ / 2, ramp_length_),
+                      max_width_, min_width_);
     } else {
       // in constant velocity
       return min_width_;
     }
   } else {
     // second half of motion
-    if (step > (step_goal_ - ramp_length_)) {
+    uint32_t ramp_down_start = max((int32_t) (step_goal_ / 2),
+                              ((int32_t) step_goal_ - (int32_t) ramp_length_));
+    if (step >=  ramp_down_start) {
       // in ramp part
-      return map(step, (step_goal_ - ramp_length_), step_goal_,
-                                                  min_width_, max_width_);
+      return map(step, ramp_down_start, step_goal_, min_width_, max_width_);
     } else {
       // in constant velocity
       return min_width_;
