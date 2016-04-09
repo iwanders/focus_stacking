@@ -26,6 +26,8 @@ var config_element_relations = {
 
     camera_shutter_duration : {selector:'#camera_shutter_duration input', key: "camera_shutter_duration", parser:parseFloat},
     camera_focus_duration : {selector:'#camera_focus_duration input', key: "camera_focus_duration", parser:parseFloat},
+
+    ui_transmission_ratio : {selector:'#interface_setting_transmission_ratio ', key: "ui_transmission_ratio", parser:parseFloat},
 }
 
 function getAllElements(){
@@ -71,15 +73,30 @@ $( document ).ready(function() {
         console.log("v");
         console.log(v);
 
+        $(v.selector).bind('input', function () {
+            var number = v.parser($(this).val());
+            console.log("Change number: " + number);
+            if (number == current_config[v.key]){
+                console.log("identical");
+                $(v.selector).parent().addClass('has-success');
+                $(v.selector).parent().removeClass('has-warning');
+            } else {
+                console.log("different");
+                $(v.selector).parent().removeClass('has-success');
+                $(v.selector).parent().addClass('has-warning');
+            }
+        });
         $(v.selector).change(function () {
             var number = v.parser($(this).val());
             console.log("Change number: " + number);
             if (number == current_config[v.key]){
                 console.log("identical");
                 $(v.selector).parent().addClass('has-success');
+                $(v.selector).parent().removeClass('has-warning');
             } else {
                 console.log("different");
                 $(v.selector).parent().removeClass('has-success');
+                $(v.selector).parent().addClass('has-warning');
             }
         });
 
@@ -176,6 +193,10 @@ $( document ).ready(function() {
     });
 
 
+    $('#settings_modal').bind('hide.bs.modal', function(){
+        setAllElements();
+    });
+
     $('#motor_config_upload').click(function (event){
         console.log(event);
         getAllElements();
@@ -184,11 +205,31 @@ $( document ).ready(function() {
         this.blur();
     });
 
+    $('#camera_config_upload').click(function (event){
+        getAllElements();
+        stacker.serial_set_config(stacker.unflatten_config(current_config));
+        stacker.serial_get_config();
+        this.blur();
+    });
+
+
     $('#motor_config_move').click(function (event){
         console.log(event);
         var steps = parseFloat($('#motor_config_move_steps').val());
         stacker.serial_action_motor(steps);
         this.blur();
+    });
+
+    $('#test_camera').click(function (event){
+        console.log(event);
+        stacker.serial_action_photo();
+        this.blur();
+    });
+
+    $('#interface_setting_transmission_ratio').blur( function (event){
+        console.log("Blur of transmission ratio");
+        getAllElements();
+        $(this).trigger("change");
     });
 
 

@@ -50,9 +50,12 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
 
             # convert the JSON into a message and put it.
             msg = message.Msg()
-            msg.from_dict(msgdata)
-            data = msg
-            self.stacker.put_message(data)
+            try:
+                msg.from_dict(msgdata)
+                data = msg
+                self.stacker.put_message(data)
+            except TypeError as e:
+                cherrypy.log("Failed sending message: {}".format(e))
 
         if (msgtype == "connect_serial"):
             res = self.stacker.connect(msgdata["device"])

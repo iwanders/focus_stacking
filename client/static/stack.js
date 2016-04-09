@@ -115,6 +115,10 @@ Stack.prototype.serial_action_motor = function(steps){
     this.send("serial", {"msg_type":"action_motor", "action_motor":{"steps":steps}});
 }
 
+Stack.prototype.serial_action_photo = function(steps){
+    this.send("serial", {"msg_type":"action_photo"});
+}
+
 Stack.prototype.flatten_config = function (cfg) {
     var flat_config = {};
     flat_config["motor_min_width"] = cfg.motor.min_width;

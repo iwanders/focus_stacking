@@ -16,12 +16,12 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
-            <a href="#" class="navbar-brand" data-toggle="modal" data-target="#information" onclick="$('#information').show();">Focus Stacking</a>
+            <a href="#" class="navbar-brand" data-toggle="modal" data-target="#information_modal" onclick="$('#information_modal').show();">Focus Stacking</a>
         </div>
 
         <ul class="nav navbar-nav">
             <!-- <li><a href="#" id="navbar_status">Status</a></li> -->
-            <li><a href="#" data-toggle="modal" data-target="#settings" onclick="$('#settings').show();">Settings</a></li>
+            <li><a href="#" data-toggle="modal" data-target="#settings_modal" onclick="$('#settings_modal').show();">Settings</a></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
@@ -40,7 +40,7 @@
 
 
 
-        <div class="modal fade" tabindex="-1" role="dialog" id="information">
+        <div class="modal fade" tabindex="-1" role="dialog" id="information_modal">
           <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -59,7 +59,7 @@
         </div>
         </div>
 
-        <div class="modal fade" tabindex="-1" role="dialog" id="settings">
+        <div class="modal fade" tabindex="-1" role="dialog" id="settings_modal">
           <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -87,7 +87,7 @@
                                             In this interface the motor movements are expressed in degrees. The motor and firmware uses the number of steps made by the stepper driver. This parameter sets the conversion ratio between the two.
                                             <div class="input-group">
                                                 <span class="input-group-addon">transmission_ratio</span>
-                                                <input type="number" class="form-control" id="transmission_ratio" min="0" />
+                                                <input type="number" class="form-control" id="interface_setting_transmission_ratio" min="0" />
                                                 <span class="input-group-addon">steps / degree</span>
                                             </div>
                                         </p>
@@ -130,11 +130,12 @@
                                         </p>
                                     </div>
                                     <p>
-                                        
+                                                
                                         <div class="input-group">
                                             <span class="input-group-btn">
-                                                <a href="#" class="btn btn-primary" role="button" id="motor_config_upload">Upload</a>
+                                                <a href="#" class="btn btn-warning" role="button" id="motor_config_upload">Upload</a>
                                             </span>
+
                                             <input type="number" class="form-control" value="100" id="motor_config_move_steps" />
                                             <span class="input-group-addon">steps</span>
                                             <span class="input-group-btn">
@@ -144,6 +145,7 @@
                                     </p>
                                 </div>
                             </div> <!-- end panel -->
+                            
                         </div>
 
                         <div role="tabpanel" class="tab-pane" id="camera_settings">
@@ -171,9 +173,13 @@
 
                                     </div>
                                     <p>
-                                        <button id="test_camera" type="button" class="btn btn-default">
-                                          <span class="glyphicon glyphicon-camera"></span> Take Photo
-                                        </button>
+
+                                        <div class="input-group">
+                                            <a href="#" class="btn btn-warning" role="button" id="camera_config_upload">Upload</a>
+                                            <button id="test_camera" type="button" class="btn btn-default pull-right">
+                                              <span class="glyphicon glyphicon-camera"></span> Take Photo
+                                            </button>
+                                        </div>
                                     </p>
                                 </div>
                             </div> <!-- end panel -->
