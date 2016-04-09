@@ -25,9 +25,9 @@
 #define FIRMWARE_CONFIG_H_
 
 // direction pin of stepper motor driver board
-#define MOTOR_DIRECTION_PIN 15
+#define MOTOR_DIRECTION_PIN 9
 // steps pin of stepper motor driver board.
-#define MOTOR_STEPS_PIN 16
+#define MOTOR_STEPS_PIN 10
 
 // if this is defined the motor stepper is ran in an isr using IntervalTimer.
 #define USE_MOTOR_STEPPER_BACKGROUND
@@ -47,10 +47,10 @@
 
 
 // Focus pin of the camera, it is high when the focus is 'pressed'.
-#define CAMERA_FOCUS_PIN 13
+#define CAMERA_FOCUS_PIN 21
 
 // shutter pin of the camera, high when 'pressed'.
-#define CAMERA_SHUTTER_PIN 14
+#define CAMERA_SHUTTER_PIN 5
 
 // Default parameters, delay & durations are in milliseconds
 
