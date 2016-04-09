@@ -62,118 +62,130 @@
         <div class="modal fade" tabindex="-1" role="dialog" id="settings">
           <div class="modal-dialog">
             <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Settings</h4>
-            </div>
-            <div class="modal-body">
-                <p>
-                    This panel holds settings which are not often changed.
-                </p>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Settings</h4>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" role="tablist" id="settings_tabs">
+                        <li role="presentation" class="active"><a href="#interface_settings" aria-controls="interface_settings"  role="tab" data-toggle="tab">Interface</a></li>
+                        <li role="presentation"><a href="#motor_settings" aria-controls="motor_settings"  role="tab" data-toggle="tab">Motor</a></li>
+                        <li role="presentation"><a href="#camera_settings" aria-controls="camera_settings"  role="tab" data-toggle="tab">Camera</a></li>
+                        <!--<li role="presentation"><a href="#settings"  role="tab" data-toggle="tab">Settings</a></li>-->
+                    </ul>
 
 
-                <div class="panel panel-default">
-                    <div class="panel-heading">Transmission ratio</div>
-                        <div class="panel-body">
-                            <div class="form-group">
-                                <p class="setting_description">
-                                    In this interface the motor movements are expressed in degrees. The motor and firmware uses the number of steps made by the stepper driver. This parameter sets the conversion ratio between the two.
-                                    <div class="input-group">
-                                        <span class="input-group-addon">transmission_ratio</span>
-                                        <input type="number" class="form-control" id="transmission_ratio" min="0" />
-                                        <span class="input-group-addon">steps / degree</span>
+                    <div class="tab-content">
+
+
+                        <div role="tabpanel" class="tab-pane active" id="interface_settings">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Transmission ratio</div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <p class="setting_description">
+                                            In this interface the motor movements are expressed in degrees. The motor and firmware uses the number of steps made by the stepper driver. This parameter sets the conversion ratio between the two.
+                                            <div class="input-group">
+                                                <span class="input-group-addon">transmission_ratio</span>
+                                                <input type="number" class="form-control" id="transmission_ratio" min="0" />
+                                                <span class="input-group-addon">steps / degree</span>
+                                            </div>
+                                        </p>
                                     </div>
-                                </p>
-                            </div>
+                                </div>
+                            </div><!-- end panel -->
                         </div>
-                    </div> <!-- end panel -->
 
-                <div class="panel panel-default">
-                    <div class="panel-heading">Motor</div>
-                    <div class="panel-body">
-                        <!-- <p>Configures the motor parameters.</p> -->
+                        <div role="tabpanel" class="tab-pane" id="motor_settings">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Motor</div>
+                                <div class="panel-body">
+                                    <!-- <p>Configures the motor parameters.</p> -->
 
-                        <div class="form-group">
-                            <p class="setting_description">
-                                The motor min_width field determines the minimum duration between step pulses. If this value is lower, the maximum speed of the motor will be higher.
-                                <div class="input-group" id="motor_min_width">
-                                    <span class="input-group-addon">min_width</span>
-                                    <input type="number" class="form-control"  min="0" />
-                                    <span class="input-group-addon">us</span>
-                                </div>
-                            </p>
-                            <p class="setting_description">
-                                The motor max_width field determines the maximum duration between step pulses. If this value is higher, the motor will start at a slower speed.
-                                <div class="input-group"  id="motor_max_width">
-                                    <span class="input-group-addon">max_width</span>
-                                    <input type="number" class="form-control" min="0" />
-                                    <span class="input-group-addon">us</span>
-                                </div>
-                            </p>
+                                    <div class="form-group">
+                                        <p class="setting_description">
+                                            The motor min_width field determines the minimum duration between step pulses. If this value is lower, the maximum speed of the motor will be higher.
+                                            <div class="input-group" id="motor_min_width">
+                                                <span class="input-group-addon">min_width</span>
+                                                <input type="number" class="form-control"  min="0" />
+                                                <span class="input-group-addon">us</span>
+                                            </div>
+                                        </p>
+                                        <p class="setting_description">
+                                            The motor max_width field determines the maximum duration between step pulses. If this value is higher, the motor will start at a slower speed.
+                                            <div class="input-group"  id="motor_max_width">
+                                                <span class="input-group-addon">max_width</span>
+                                                <input type="number" class="form-control" min="0" />
+                                                <span class="input-group-addon">us</span>
+                                            </div>
+                                        </p>
 
-                            <p class="setting_description">
-                                The motor ramps up the speed by using a linear profile to change the duration between the step pulses from max_width to min_width. The ramp_length parameter determines how many steps are taken to make this transition.
-                                <div class="input-group" id="motor_ramp_length">
-                                    <span class="input-group-addon">ramp_length</span>
-                                    <input type="number" class="form-control" min="0" />
-                                    <span class="input-group-addon">steps</span>
+                                        <p class="setting_description">
+                                            The motor ramps up the speed by using a linear profile to change the duration between the step pulses from max_width to min_width. The ramp_length parameter determines how many steps are taken to make this transition.
+                                            <div class="input-group" id="motor_ramp_length">
+                                                <span class="input-group-addon">ramp_length</span>
+                                                <input type="number" class="form-control" min="0" />
+                                                <span class="input-group-addon">steps</span>
+                                            </div>
+                                        </p>
+                                    </div>
+                                    <p>
+                                        
+                                        <div class="input-group">
+                                            <span class="input-group-btn">
+                                                <a href="#" class="btn btn-primary" role="button" id="motor_config_upload">Upload</a>
+                                            </span>
+                                            <input type="number" class="form-control" value="100" id="motor_config_move_steps" />
+                                            <span class="input-group-addon">steps</span>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button" id="motor_config_move">Move motor</button>
+                                            </span>
+                                        </div>
+                                    </p>
                                 </div>
-                            </p>
+                            </div> <!-- end panel -->
                         </div>
-                        <p>
-                            
-                            <div class="input-group">
-                                <span class="input-group-btn">
-                                    <a href="#" class="btn btn-primary" role="button" id="motor_config_upload">Upload</a>
-                                </span>
-                                <input type="number" class="form-control" value="100" id="motor_config_move_steps" />
-                                <span class="input-group-addon">steps</span>
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default" type="button" id="motor_config_move">Move motor</button>
-                                </span>
-                            </div>
-                        </p>
-                    </div>
-                </div> <!-- end panel -->
 
-                <div class="panel panel-default">
-                    <div class="panel-heading">Camera</div>
-                    <div class="panel-body">
-                        <!-- <p>Configures the camera parameters.</p>-->
+                        <div role="tabpanel" class="tab-pane" id="camera_settings">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Camera</div>
+                                <div class="panel-body">
 
-                        <div class="form-group">
-                            <p class="setting_description">
-                                When a photo is to be made, the trigger button is first 'pressed' to the focus stage for a duration of focus_duration.
-                                <div class="input-group" id="camera_focus_duration">
-                                    <span class="input-group-addon">focus_duration</span>
-                                    <input type="number" class="form-control" min="0" />
-                                    <span class="input-group-addon">ms</span>
+                                    <div class="form-group">
+                                        <p class="setting_description">
+                                            When a photo is to be made, the trigger button is first 'pressed' to the focus stage for a duration of focus_duration.
+                                            <div class="input-group" id="camera_focus_duration">
+                                                <span class="input-group-addon">focus_duration</span>
+                                                <input type="number" class="form-control" min="0" />
+                                                <span class="input-group-addon">ms</span>
+                                            </div>
+                                        </p>
+                                        <p class="setting_description">
+                                            After the trigger button has been held at the focus stage, the button the 'shutter' stage of the button is kept pressed for the shutter_duration.
+                                            <div class="input-group" id="camera_shutter_duration">
+                                                <span class="input-group-addon">shutter_duration</span>
+                                                <input type="number" class="form-control" min="0" />
+                                                <span class="input-group-addon">ms</span>
+                                            </div>
+                                        </p>
+
+                                    </div>
+                                    <p>
+                                        <button id="test_camera" type="button" class="btn btn-default">
+                                          <span class="glyphicon glyphicon-camera"></span> Take Photo
+                                        </button>
+                                    </p>
                                 </div>
-                            </p>
-                            <p class="setting_description">
-                                After the trigger button has been held at the focus stage, the button the 'shutter' stage of the button is kept pressed for the shutter_duration.
-                                <div class="input-group" id="camera_shutter_duration">
-                                    <span class="input-group-addon">shutter_duration</span>
-                                    <input type="number" class="form-control" min="0" />
-                                    <span class="input-group-addon">ms</span>
-                                </div>
-                            </p>
-
+                            </div> <!-- end panel -->
                         </div>
-                        <p>
-                            <button id="test_camera" type="button" class="btn btn-default">
-                              <span class="glyphicon glyphicon-camera"></span> Take Photo
-                            </button>
-                        </p>
-                    </div>
-                </div> <!-- end panel -->
 
-            </div> <!-- modal body -->
+                    </div> <!-- tab content-->
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <!-- <button type="button" class="btn btn-primary">Upload</button> -->
-            </div>
+                </div> <!-- modal body -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <!-- <button type="button" class="btn btn-primary">Upload</button> -->
+                </div>
             </div><!-- /.modal-content -->
           </div><!-- /.modal-dialog -->
         </div><!-- /.modal -->
