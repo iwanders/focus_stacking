@@ -42,6 +42,8 @@ void StackControl::photo() {
 
 void StackControl::move(int32_t steps) {
   sub_state_ = start_movement;
+  current_step_ = 0;  // reset current step counter
+  duration_ = 0;
   this->setMoveSteps(steps);
   state_ = should_pause;
 }
@@ -126,7 +128,7 @@ void StackControl::run() {
       #endif
       // if done moving, advance to the next step
       if (motor_->stepsToGo() == 0) {
-        sub_state_ = next_step;  // advance the state
+        sub_state_ = pause_after_movement;  // advance the state
       }
       break;
 
