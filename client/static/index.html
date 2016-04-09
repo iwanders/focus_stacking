@@ -215,6 +215,66 @@
             The firmware version is being retrieved... If you have long enough to read this, you likely have the wrong serial port.
         </div>
 
+        <div class="panel panel-default">
+            <div class="panel-heading">Stack Main Parameters</div>
+            <div class="panel-body">
+                <div class="form-group">
+
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <p class="setting_description">
+                                    The number of photos to take.
+                                </p>
+                                <div class="input-group" id="stack_count">
+                                    <span class="input-group-addon">stack_count</span>
+                                    <input type="number" class="form-control"  min="0" />
+                                    <span class="input-group-addon">#</span>
+                                </div>
+                            </div><!-- /.col-lg-6 -->
+                            <div class="col-lg-6">
+
+                                <p class="setting_description">
+                                    The movement of the motor between the steps.
+                                </p>
+                                <div class="input-group" id="move_degrees">
+                                    <span class="input-group-addon">move_degrees</span>
+                                    <input type="number" class="form-control" />
+                                    <span class="input-group-addon">deg</span>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" id="stack_control_move_left"><span class="glyphicon glyphicon-arrow-left"></span></button>
+                                        <button class="btn btn-default" type="button" id="stack_control_move_right"><span class="glyphicon glyphicon-arrow-right"></span></button>
+                                    </span>
+                                </div>
+                            </div><!-- /.col-lg-6 -->
+                        </div><!-- /.row -->
+                        <div>&nbsp;</div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <p class="setting_description">
+                                    The delay before a photo such that vibrations are damped.
+                                </p>
+                                <div class="input-group"  id="stack_delay_before_photo">
+                                    <span class="input-group-addon">delay_before_photo</span>
+                                    <input type="number" class="form-control" min="0" />
+                                    <span class="input-group-addon">ms</span>
+                                </div>
+                            </div><!-- /.col-lg-6 -->
+                            <div class="col-lg-6">
+                                <p class="setting_description">
+                                    The delay after a photo before the motor moves.
+                                </p>
+
+                                <div class="input-group" id="stack_delay_after_photo">
+                                    <span class="input-group-addon">stack_delay_after_photo</span>
+                                    <input type="number" class="form-control" min="0" />
+                                    <span class="input-group-addon">ms</span>
+                                </div>
+                            </div><!-- /.col-lg-6 -->
+                        </div><!-- /.row -->
+                </div>
+            </div>
+        </div>
 
 
     </div>

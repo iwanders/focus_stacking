@@ -17,6 +17,7 @@ var current_config = {
                         interface_status_interval: 100,
 
                         ui_transmission_ratio:1,
+                        ui_stack_move_degrees:0,
                 };
 
 var config_element_relations = {
@@ -27,16 +28,24 @@ var config_element_relations = {
     camera_shutter_duration : {selector:'#camera_shutter_duration input', key: "camera_shutter_duration", parser:parseFloat},
     camera_focus_duration : {selector:'#camera_focus_duration input', key: "camera_focus_duration", parser:parseFloat},
 
+
+    stack_stack_count : {selector:'#stack_count input', key: "stack_stack_count", parser:parseFloat},
+    stack_delay_before_photo : {selector:'#stack_delay_before_photo input', key: "stack_delay_before_photo", parser:parseFloat},
+    stack_delay_after_photo : {selector:'#stack_delay_after_photo input', key: "stack_delay_after_photo", parser:parseFloat},
+    stack_move_steps : {selector:'#move_degrees input', key: "ui_stack_move_degrees", parser:parseFloat},
+
     ui_transmission_ratio : {selector:'#interface_setting_transmission_ratio ', key: "ui_transmission_ratio", parser:parseFloat},
 }
 
 function getAllElements(){
+    current_config["stack_move_steps"] = current_config["ui_stack_move_degrees"] * current_config["ui_transmission_ratio"];
     $.each(config_element_relations, function (k, v){
         current_config[v.key] = v.parser($(v.selector).val());
     });
 }
 
 function setAllElements(){
+    current_config["ui_stack_move_degrees"] = current_config["stack_move_steps"] * 1.0/current_config["ui_transmission_ratio"];
     $.each(config_element_relations, function (k, v){
         $(v.selector).val(current_config[v.key]);
         $(v.selector).trigger("change");
@@ -227,10 +236,41 @@ $( document ).ready(function() {
     });
 
     $('#interface_setting_transmission_ratio').blur( function (event){
-        console.log("Blur of transmission ratio");
         getAllElements();
         $(this).trigger("change");
     });
 
+    $('#stack_delay_after_photo input').blur( function (event){
+        getAllElements();
+        stacker.serial_set_config(stacker.unflatten_config(current_config));
+        stacker.serial_get_config();
+    });
+    $('#stack_delay_before_photo input').blur( function (event){
+        getAllElements();
+        stacker.serial_set_config(stacker.unflatten_config(current_config));
+        stacker.serial_get_config();
+    });
+
+    $('#move_degrees input').blur( function (event){
+        getAllElements();
+        current_config["stack_move_steps"] = current_config["ui_stack_move_degrees"] * current_config["ui_transmission_ratio"];
+        stacker.serial_set_config(stacker.unflatten_config(current_config));
+        stacker.serial_get_config();
+    });
+    $('#move_degrees input').on("input", function (){
+        current_config["stack_move_steps"] = current_config["ui_stack_move_degrees"] * current_config["ui_transmission_ratio"];
+    });
+
+
+    $('#stack_control_move_left').click(function (event){
+        console.log(event);
+        stacker.serial_action_motor(current_config["stack_move_steps"]);
+        this.blur();
+    });
+    $('#stack_control_move_right').click(function (event){
+        console.log(event);
+        stacker.serial_action_motor(-current_config["stack_move_steps"]);
+        this.blur();
+    });
 
 });
