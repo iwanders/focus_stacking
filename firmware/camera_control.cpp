@@ -36,7 +36,7 @@ void CameraOptocoupler::photoBlocking() {
     // Serial.print(" focus_pin_ LOW");
     // Serial.println(" shutter_duration_ LOW");
     digitalWrite(focus_pin_, LOW);
-    digitalWrite(shutter_duration_, LOW);
+    digitalWrite(shutter_pin_, LOW);
 }
 
 

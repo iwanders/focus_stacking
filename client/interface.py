@@ -184,7 +184,7 @@ if __name__ == "__main__":
         sys.exit(0)
 
     # sending something
-    if (args.command.startswith("set_") or command.startswith("action_")):
+    if (args.command.startswith("set_") or args.command.startswith("action_")):
         command_id = getattr(message.msg_type, args.command)
         if (command_id in message.msg_type_field):
             fieldname = message.msg_type_field[command_id]
