@@ -74,6 +74,7 @@ class StackInterface{
     action_camera = 5,
     action_stop = 6,
     get_version = 7,
+    get_status = 8,
   };
 
   // config struct for this class.
@@ -99,6 +100,12 @@ class StackInterface{
     int32_t steps;
   } msg_action_motor_t;
 
+  typedef struct {
+    MotorStepper::status_t motor;
+    CameraOptocoupler::status_t camera;
+    StackControl::status_t stack;
+  } msg_status_t;
+
   // A struct which represents a message.
   typedef struct {
     msg_type type;  // aligned on 4 byte boundary
@@ -106,6 +113,7 @@ class StackInterface{
       msg_config_t config;
       msg_action_motor_t action_motor;
       msg_version_t version;
+      msg_status_t status;
       uint8_t raw[64 - 4];
     };
   } msg_t;

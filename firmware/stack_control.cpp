@@ -50,6 +50,7 @@ void StackControl::move(int32_t steps) {
 
 void StackControl::stop() {
   state_ = halted;
+  current_step_ = 0;  // reset current step counter
   motor_->stop();
   camera_->stop();
 }

@@ -85,6 +85,10 @@ class MotorStepper: public MotorControl{
     uint32_t ramp_length;
   } config_t;
 
+  typedef struct {
+    uint32_t steps_to_go;
+  } status_t;
+
   // Set the pins to be used, directory is made HIGH for reverse movement.
   // The step pin is pulsed high for a very short duration (several usec).
   // timer_interval specifies the interval of the timer in microseconds.
@@ -131,6 +135,9 @@ class MotorStepper: public MotorControl{
   }
   config_t getConfig(){
     return {min_width_, max_width_, ramp_length_};
+  }
+  status_t getStatus(){
+    return {stepsToGo()};
   }
 };
 

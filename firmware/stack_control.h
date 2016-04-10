@@ -62,6 +62,7 @@ class StackControl{
     int32_t move_steps;
   } config_t;
 
+
   enum sub_state {
       start_delay_before_photo = 0,
       delay_before_photo = 1,
@@ -82,6 +83,16 @@ class StackControl{
       running = 2
     };
 
+
+  typedef struct {
+    uint8_t current_state;
+    uint8_t current_sub_state;
+    uint32_t current_step;
+    uint32_t stack_count;
+    uint32_t current_duration;
+    bool is_stack_finished;
+    bool is_idle;
+  } status_t;
 
   // add the motor to the Stack Controller.
   void setMotor(MotorControl* motor) {
@@ -142,6 +153,11 @@ class StackControl{
   config_t getConfig() {
     return {stack_count_, delay_before_photo_, delay_after_photo_, move_steps_};
   }
+
+  status_t getStatus() {
+    return {state_, sub_state_, current_step_, stack_count_, (uint32_t) duration_, isStackFinished(), isIdle()};
+  }
+
 
   void move(int32_t steps);
 

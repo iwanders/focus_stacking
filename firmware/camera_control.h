@@ -57,6 +57,10 @@ class CameraOptocoupler: public CameraControl {
       uint32_t shutter_duration;
     } config_t;
 
+    typedef struct {
+      bool taking_photo;
+    } status_t;
+
     // initialises the object with the focus and shutter pins.
     void begin(uint8_t focus_pin, uint8_t shutter_pin) {
       focus_pin_ = focus_pin;
@@ -94,6 +98,9 @@ class CameraOptocoupler: public CameraControl {
     // Gets the current config.
     config_t getConfig(){
       return {focus_duration_, shutter_duration_};
+    }
+    status_t getStatus(){
+      return {taking_photo_};
     }
 };
 

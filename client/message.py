@@ -9,7 +9,8 @@ msg_type_t = namedtuple("msg_type", ["nop",
                                      "action_motor",
                                      "action_photo",
                                      "action_stop",
-                                     "get_version"])
+                                     "get_version",
+                                     "get_status"])
 msg_type = msg_type_t(*range(0, len(msg_type_t._fields)))
 # can do msg_type.nop now.
 
@@ -17,7 +18,8 @@ msg_type = msg_type_t(*range(0, len(msg_type_t._fields)))
 msg_type_field = {msg_type_t._fields.index("set_config"): "config",
                   msg_type_t._fields.index("get_config"): "config",
                   msg_type_t._fields.index("action_motor"): "action_motor",
-                  msg_type_t._fields.index("get_version"): "version"}
+                  msg_type_t._fields.index("get_version"): "version",
+                  msg_type_t._fields.index("get_status"): "status"}
 
 # Reverse lookup for msg type, that is id->name
 msg_type_name = dict(enumerate(msg_type_t._fields))
@@ -94,13 +96,39 @@ class MsgConfig(ctypes.LittleEndianStructure, Dictionary):
                 ("stack", ConfigStackControl),
                 ("interface", ConfigStackInterface)]
 
+
+# status messages for the parts.
+class StatusMotorStepper(ctypes.LittleEndianStructure, Dictionary):
+    _fields_ = [("steps_to_go", ctypes.c_uint)]
+
+
+class StatusCameraOptocoupler(ctypes.LittleEndianStructure, Dictionary):
+    _fields_ = [("taking_photo", ctypes.c_bool)]
+
+class StatusStackControl(ctypes.LittleEndianStructure, Dictionary):
+    _fields_ = [("current_state", ctypes.c_byte),
+                ("current_sub_state", ctypes.c_byte),
+                ("current_step", ctypes.c_uint),
+                ("stack_count", ctypes.c_uint),
+                ("current_duration", ctypes.c_uint),
+                ("is_stack_finished", ctypes.c_bool),
+                ("is_idle", ctypes.c_bool)]
+
+# The status message for the whole.
+class MsgStatus(ctypes.LittleEndianStructure, Dictionary):
+    _fields_ = [("motor", StatusMotorStepper),
+                ("camera", StatusCameraOptocoupler),
+                ("stack", StatusStackControl)]
+
+
+# other messages
 class MsgVersion(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("unstaged", ctypes.c_byte),
                 ("staged", ctypes.c_byte),
                 ("hash", ctypes.c_byte * (41))]
 
     def __iter__(self):
-        for k, t in self._fields_:                
+        for k, t in self._fields_:
             if (issubclass(t, ctypes.Structure)):
                 yield (k, dict(getattr(self, k)))
             elif (k == "hash"):
@@ -108,14 +136,17 @@ class MsgVersion(ctypes.LittleEndianStructure, Dictionary):
             else:
                 yield (k, getattr(self, k))
 
+
 class ActionMotor(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("steps", ctypes.c_int)]
 
 
+# create the composite message.
 class _MsgBody(ctypes.Union):
     _fields_ = [("config", MsgConfig),
                 ("action_motor", ActionMotor),
                 ("version", MsgVersion),
+                ("status", MsgStatus),
                 ("raw", ctypes.c_byte * (64-4))]
 
 

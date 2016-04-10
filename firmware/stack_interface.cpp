@@ -43,6 +43,14 @@ void StackInterface::run() {
 
 void StackInterface::sendStatus() {
   // assemble the status update...
+  char buffer[sizeof(msg_t)] = {0};
+  msg_t* response = reinterpret_cast<msg_t*>(buffer);
+  response->type = get_status;
+  response->status.motor = motor_->getStatus();
+  response->status.stack = stack_->getStatus();
+  response->status.camera = camera_->getStatus();
+  // send it.
+  Serial.write(buffer, sizeof(msg_t));
 }
 
 void StackInterface::retrieveConfigs() {
@@ -127,6 +135,11 @@ void StackInterface::processCommand(const msg_t* msg) {
         uint8_t hash[] = make_xstr(VERSION_GIT_HASH);
         memcpy(&(response->version.hash), hash, sizeof(response->version.hash));
         Serial.write(buffer, sizeof(msg_t));
+      }
+      break;
+
+    case get_status: {
+        sendStatus();
       }
       break;
 

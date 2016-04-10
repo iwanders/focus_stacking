@@ -28,6 +28,7 @@ var config_element_relations = {
     camera_shutter_duration : {selector:'#camera_shutter_duration input', key: "camera_shutter_duration", parser:parseInt, upload_event:[]},
     camera_focus_duration : {selector:'#camera_focus_duration input', key: "camera_focus_duration", parser:parseInt, upload_event:[]},
 
+    interface_status_interval : {selector:'#interface_status_interval input', key: "interface_status_interval", parser:parseInt, upload_event:["blur"]},
 
     stack_stack_count : {selector:'#stack_count input', key: "stack_stack_count", parser:parseInt, upload_event:["blur"]},
     stack_delay_before_photo : {selector:'#stack_delay_before_photo input', key: "stack_delay_before_photo", parser:parseInt, upload_event:["blur"]},
@@ -42,6 +43,7 @@ function getAllElements(){
     $.each(config_element_relations, function (k, v){
         current_config[v.key] = v.parser($(v.selector).val());
     });
+    current_config["interface_status_interval"] = Math.max(100, current_config["interface_status_interval"]); // enforce minimum delay on update interval.
     current_config["stack_move_steps"] = Math.round(current_config["ui_stack_move_degrees"] * current_config["ui_transmission_ratio"]);
 }
 
@@ -135,6 +137,105 @@ $( document ).ready(function() {
         // we are not yet sure that we have a correct serial port.
         $('#no_version_response').show()
         stacker.serial_get_version();
+    });
+
+    stacker.attachCommandHandler("serial_get_status", function (command, payload){
+        var sub_state_to_str = ["start_delay_before_photo",
+                                "delay_before_photo",
+                                "start_photo",
+                                "photo_busy",
+                                "pause_after_photo",
+                                "start_delay_after_photo",
+                                "delay_after_photo",
+                                "start_movement",
+                                "movement",
+                                "pause_after_movement",
+                                "next_step"]
+        /*
+          enum state {
+              halted = 0,
+              should_pause = 1,
+              running = 2
+            };
+          enum sub_state {
+              start_delay_before_photo = 0,
+              delay_before_photo = 1,
+              start_photo = 2,
+              photo_busy = 3,
+              pause_after_photo = 4,
+              start_delay_after_photo = 5,
+              delay_after_photo = 6,
+              start_movement = 7,
+              movement = 8,
+              pause_after_movement = 9,
+              next_step = 10
+            };
+
+          typedef struct {
+            uint8_t current_state;
+            uint8_t current_sub_state;
+            uint32_t current_step;
+            uint32_t stack_count;
+            uint32_t current_duration;
+            bool is_stack_finished;
+            bool is_idle;
+          } status_t;
+        */
+        var stack_status = payload.status.stack;
+        console.log("Successfully get_status");
+        if (stack_status.is_idle){
+            $('#start_stacking').prop('disabled', false);
+            $('#status_progress').removeClass("active");
+        } else {
+            $('#start_stacking').prop('disabled', true);
+            $('#status_progress').addClass("active");
+        }
+
+        if (stack_status.is_stack_finished) {
+            $('#status_progress').addClass("progress-bar-success");
+        } else {
+            $('#status_progress').removeClass("progress-bar-success");
+        }
+
+        var should_show_substep = false;
+        switch (payload.status.stack.current_state){
+            case 0:
+                // halted, check if finished.
+                if (stack_status.is_stack_finished){
+                    $('#status_operation').text("Done stacking: " + stack_status.stack_count);
+                } else {
+                    // $('#status_operation').text("Stacking: " + stack_status.current_step + " / " + stack_status.stack_count);
+                    $('#status_operation').text("Ready for operation");
+                }
+                break;
+            case 1:
+                if ([4, 6, 9].indexOf(stack_status.current_sub_state) == -1){
+                    $('#status_operation').text("Performing action.");
+                    should_show_substep = true;
+                } else {
+                    $('#status_operation').text("Ready for operation");
+                }
+                break;
+            case 2:
+                $('#status_operation').text("Stacking: " + (stack_status.current_step-1) + " / " + stack_status.stack_count);
+                $('#status_progress').width(((stack_status.current_step-1) / (stack_status.stack_count-1))*100.0 + "%");
+                should_show_substep = true
+                break;
+        }
+
+        if (should_show_substep) {
+            $('#status_action').text("Current action: " + sub_state_to_str[stack_status.current_sub_state]);
+        } else {
+            $('#status_action').text("");
+        }
+        // + 
+        
+        // 
+
+        // scale this one accordingly.
+        // $('#status_progress').text();
+        // set this to disabled if moving.
+        // $('#start_stacking');
     });
 
     stacker.attachCommandHandler("serial_get_version", function (command, payload){
@@ -245,6 +346,7 @@ $( document ).ready(function() {
     });
     $('#stop_stacking').click(function (event){
         console.log(event);
+        $('#status_progress').width("0%");
         stacker.serial_action_stop();
         this.blur();
     });
