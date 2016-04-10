@@ -5,7 +5,7 @@ from collections import namedtuple
 msg_type_t = namedtuple("msg_type", ["nop",
                                      "set_config",
                                      "get_config",
-                                     "start_stack",
+                                     "action_stack",
                                      "action_motor",
                                      "action_photo",
                                      "action_stop",

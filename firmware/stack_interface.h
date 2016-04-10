@@ -69,7 +69,7 @@ class StackInterface{
     nop = 0,
     set_config = 1,
     get_config = 2,
-    start_stack = 3,
+    action_stack = 3,
     action_motor = 4,
     action_camera = 5,
     action_stop = 6,

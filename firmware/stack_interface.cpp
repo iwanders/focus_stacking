@@ -101,7 +101,7 @@ void StackInterface::processCommand(const msg_t* msg) {
         }
       break;
 
-    case start_stack:
+    case action_stack:
         setConfigs();
         if ((stack_->isIdle())) {
           stack_->stack();
