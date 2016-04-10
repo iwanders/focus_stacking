@@ -203,6 +203,7 @@ $( document ).ready(function() {
                 // halted, check if finished.
                 if (stack_status.is_stack_finished){
                     $('#status_operation').text("Done stacking: " + stack_status.stack_count);
+                    $('#status_progress').width("100%");
                 } else {
                     // $('#status_operation').text("Stacking: " + stack_status.current_step + " / " + stack_status.stack_count);
                     $('#status_operation').text("Ready for operation");
@@ -218,7 +219,7 @@ $( document ).ready(function() {
                 break;
             case 2:
                 $('#status_operation').text("Stacking: " + (stack_status.current_step-1) + " / " + stack_status.stack_count);
-                $('#status_progress').width(((stack_status.current_step-1) / (stack_status.stack_count-1))*100.0 + "%");
+                $('#status_progress').width(((stack_status.current_step-1) / (stack_status.stack_count))*100.0 + "%");
                 should_show_substep = true
                 break;
         }
