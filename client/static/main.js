@@ -21,31 +21,32 @@ var current_config = {
                 };
 
 var config_element_relations = {
-    motor_min_width : {selector:'#motor_min_width input', key: "motor_min_width", parser:parseFloat},
-    motor_max_width : {selector:'#motor_max_width input', key: "motor_max_width", parser:parseFloat},
-    motor_ramp_length : {selector:'#motor_ramp_length input', key: "motor_ramp_length", parser:parseFloat},
+    motor_min_width : {selector:'#motor_min_width input', key: "motor_min_width", parser:parseInt, upload_event:[]},
+    motor_max_width : {selector:'#motor_max_width input', key: "motor_max_width", parser:parseInt, upload_event:[]},
+    motor_ramp_length : {selector:'#motor_ramp_length input', key: "motor_ramp_length", parser:parseInt, upload_event:[]},
 
-    camera_shutter_duration : {selector:'#camera_shutter_duration input', key: "camera_shutter_duration", parser:parseFloat},
-    camera_focus_duration : {selector:'#camera_focus_duration input', key: "camera_focus_duration", parser:parseFloat},
+    camera_shutter_duration : {selector:'#camera_shutter_duration input', key: "camera_shutter_duration", parser:parseInt, upload_event:[]},
+    camera_focus_duration : {selector:'#camera_focus_duration input', key: "camera_focus_duration", parser:parseInt, upload_event:[]},
 
 
-    stack_stack_count : {selector:'#stack_count input', key: "stack_stack_count", parser:parseFloat},
-    stack_delay_before_photo : {selector:'#stack_delay_before_photo input', key: "stack_delay_before_photo", parser:parseFloat},
-    stack_delay_after_photo : {selector:'#stack_delay_after_photo input', key: "stack_delay_after_photo", parser:parseFloat},
-    stack_move_steps : {selector:'#move_degrees input', key: "ui_stack_move_degrees", parser:parseFloat},
+    stack_stack_count : {selector:'#stack_count input', key: "stack_stack_count", parser:parseInt, upload_event:["blur"]},
+    stack_delay_before_photo : {selector:'#stack_delay_before_photo input', key: "stack_delay_before_photo", parser:parseInt, upload_event:["blur"]},
+    stack_delay_after_photo : {selector:'#stack_delay_after_photo input', key: "stack_delay_after_photo", parser:parseInt, upload_event:["blur"]},
+
+    ui_stack_move_degrees : {selector:'#move_degrees input', key: "ui_stack_move_degrees", parser:parseInt, upload_event:["blur"]},
 
     ui_transmission_ratio : {selector:'#interface_setting_transmission_ratio ', key: "ui_transmission_ratio", parser:parseFloat},
 }
 
 function getAllElements(){
-    current_config["stack_move_steps"] = current_config["ui_stack_move_degrees"] * current_config["ui_transmission_ratio"];
     $.each(config_element_relations, function (k, v){
         current_config[v.key] = v.parser($(v.selector).val());
     });
+    current_config["stack_move_steps"] = Math.round(current_config["ui_stack_move_degrees"] * current_config["ui_transmission_ratio"]);
 }
 
 function setAllElements(){
-    current_config["ui_stack_move_degrees"] = current_config["stack_move_steps"] * 1.0/current_config["ui_transmission_ratio"];
+    current_config["ui_stack_move_degrees"] = Math.round(current_config["stack_move_steps"] * 1.0/current_config["ui_transmission_ratio"]);
     $.each(config_element_relations, function (k, v){
         $(v.selector).val(current_config[v.key]);
         $(v.selector).trigger("change");
@@ -84,29 +85,39 @@ $( document ).ready(function() {
 
         $(v.selector).bind('input', function () {
             var number = v.parser($(this).val());
-            console.log("Change number: " + number);
+            // console.log("Change number: " + number);
             if (number == current_config[v.key]){
-                console.log("identical");
+                // console.log("identical");
                 $(v.selector).parent().addClass('has-success');
                 $(v.selector).parent().removeClass('has-warning');
             } else {
-                console.log("different");
+                // console.log("different");
                 $(v.selector).parent().removeClass('has-success');
                 $(v.selector).parent().addClass('has-warning');
             }
         });
         $(v.selector).change(function () {
             var number = v.parser($(this).val());
-            console.log("Change number: " + number);
+            // console.log("Change number: " + number);
             if (number == current_config[v.key]){
-                console.log("identical");
+                // console.log("identical");
                 $(v.selector).parent().addClass('has-success');
                 $(v.selector).parent().removeClass('has-warning');
             } else {
-                console.log("different");
+                // console.log("different");
                 $(v.selector).parent().removeClass('has-success');
                 $(v.selector).parent().addClass('has-warning');
             }
+        });
+
+        $.each(v.upload_event, function (eventindex, event_name) {
+            console.log(event_name);
+            $(v.selector).bind(event_name, function (event){
+                console.log("Autouplaod");
+                getAllElements();
+                stacker.serial_set_config(stacker.unflatten_config(current_config));
+                stacker.serial_get_config();
+            });
         });
 
     });
@@ -157,9 +168,6 @@ $( document ).ready(function() {
         //current_config["config"] = payload["config"]
         var cfg = payload["config"];
         console.log("Got config");
-        console.log(cfg);
-        console.log(stacker.flatten_config(cfg));
-        console.log(current_config);
         $.extend(current_config, stacker.flatten_config(cfg))
         setAllElements();
     });
@@ -240,23 +248,6 @@ $( document ).ready(function() {
         $(this).trigger("change");
     });
 
-    $('#stack_delay_after_photo input').blur( function (event){
-        getAllElements();
-        stacker.serial_set_config(stacker.unflatten_config(current_config));
-        stacker.serial_get_config();
-    });
-    $('#stack_delay_before_photo input').blur( function (event){
-        getAllElements();
-        stacker.serial_set_config(stacker.unflatten_config(current_config));
-        stacker.serial_get_config();
-    });
-
-    $('#move_degrees input').blur( function (event){
-        getAllElements();
-        current_config["stack_move_steps"] = current_config["ui_stack_move_degrees"] * current_config["ui_transmission_ratio"];
-        stacker.serial_set_config(stacker.unflatten_config(current_config));
-        stacker.serial_get_config();
-    });
     $('#move_degrees input').on("input", function (){
         current_config["stack_move_steps"] = current_config["ui_stack_move_degrees"] * current_config["ui_transmission_ratio"];
     });
