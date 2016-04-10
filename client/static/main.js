@@ -78,11 +78,6 @@ $( document ).ready(function() {
     stacker.open($(location).attr('host') + "/ws");
 
     $.each(config_element_relations, function (k, v){
-        console.log("k");
-        console.log(k);
-        console.log("v");
-        console.log(v);
-
         $(v.selector).bind('input', function () {
             var number = v.parser($(this).val());
             // console.log("Change number: " + number);
@@ -110,10 +105,11 @@ $( document ).ready(function() {
             }
         });
 
+        // bind those events that should lead to an upload.
         $.each(v.upload_event, function (eventindex, event_name) {
-            console.log(event_name);
+            // console.log(event_name);
             $(v.selector).bind(event_name, function (event){
-                console.log("Autouplaod");
+                // console.log("Autouplaod");
                 getAllElements();
                 stacker.serial_set_config(stacker.unflatten_config(current_config));
                 stacker.serial_get_config();
@@ -240,6 +236,16 @@ $( document ).ready(function() {
     $('#test_camera').click(function (event){
         console.log(event);
         stacker.serial_action_photo();
+        this.blur();
+    });
+    $('#start_stacking').click(function (event){
+        console.log(event);
+        stacker.serial_action_stack();
+        this.blur();
+    });
+    $('#stop_stacking').click(function (event){
+        console.log(event);
+        stacker.serial_action_stop();
         this.blur();
     });
 

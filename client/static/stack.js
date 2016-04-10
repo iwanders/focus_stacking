@@ -41,9 +41,8 @@ Stack.prototype.reconnect = function(){
 
 Stack.prototype.send = function(msgtype, data) {
     if (this.connected == true) {
-        console.log("Sending");
+        console.log("Sending over websocket:" + JSON.stringify([msgtype, data]));
         this.socket.send(JSON.stringify([msgtype, data]));
-        console.log(JSON.stringify([msgtype, data]));
     } else {
         console.log("Sending without websocket port.");
     }
@@ -113,6 +112,14 @@ Stack.prototype.serial_set_config = function(config){
 
 Stack.prototype.serial_action_motor = function(steps){
     this.send("serial", {"msg_type":"action_motor", "action_motor":{"steps":steps}});
+}
+
+Stack.prototype.serial_action_stack = function(){
+    this.send("serial", {"msg_type":"action_stack"});
+}
+
+Stack.prototype.serial_action_stop = function(){
+    this.send("serial", {"msg_type":"action_stop"});
 }
 
 Stack.prototype.serial_action_photo = function(steps){
