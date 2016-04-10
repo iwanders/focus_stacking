@@ -153,6 +153,11 @@ class StackInterface{
   // sets the stored configs in the StackInterface to those of the components.
   void retrieveConfigs();
 
+  void setStartStackPin(uint8_t start_stack_pin){
+    start_stack_pin_ = start_stack_pin;
+    pinMode(start_stack_pin_, INPUT_PULLUP);
+  }
+
  protected:
   // pointers to the relevant objects
   MotorStepper* motor_;
@@ -167,6 +172,9 @@ class StackInterface{
   // state
   elapsedMillis duration_;
   uint32_t status_interval_;
+
+  // pin etc.
+  uint8_t start_stack_pin_;
 
   // Emit a status over the serial port
   void sendStatus();

@@ -39,6 +39,14 @@ void StackInterface::run() {
       processCommand(reinterpret_cast<msg_t*>(buffer));
     }
   }
+
+  // check if we need to start with the start button.
+  if (digitalRead(start_stack_pin_) == LOW){
+    setConfigs();
+    if ((stack_->isIdle())) {
+      stack_->stack();
+    }    
+  }
 }
 
 void StackInterface::sendStatus() {

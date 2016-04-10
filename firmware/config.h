@@ -71,7 +71,10 @@
 // The number of stack steps to take (the number of movements and photos)
 #define STACK_DEFAULT_STACK_COUNT 5
 
+// The interval in milliseconds between status updates from the firmware.
 #define INTERFACE_DEFAULT_STATUS_INTERVAL 100
 
+// The pin which is pulled to ground when the stacking should be started.
+#define INTERFACE_START_STACK_PIN 22
 
 #endif  // FIRMWARE_CONFIG_H_

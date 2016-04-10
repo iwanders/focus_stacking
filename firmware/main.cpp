@@ -74,6 +74,7 @@ extern "C" int main(void) {
   stacker.setStackCount(STACK_DEFAULT_STACK_COUNT);
 
   interface.setStatusInterval(INTERFACE_DEFAULT_STATUS_INTERVAL);
+  interface.setStartStackPin(INTERFACE_START_STACK_PIN);
 
   interface.retrieveConfigs();
   while (true) {
