@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import cherrypy
 import os
 import logging
@@ -13,11 +14,19 @@ import message
 
 
 class FocusStackRoot:
+    """
+        This is the webserver root of CherryPy.
+
+        :param stack_interface: The interface object that communicates to the
+            serial port.
+
+    """
     def __init__(self, stack_interface):
         self.stack = stack_interface
 
     @cherrypy.expose
     def ws(self):
+        # hangle this path with the websocket handler.
         handler = cherrypy.request.ws_handler
     ws._cp_config = {'tools.staticdir.on': False}
 
@@ -28,19 +37,33 @@ class FocusStackRoot:
 
 
 class WebsocketHandler(ws4py.websocket.WebSocket):
+    """
+        The object created for each websocket. It mainly passes on the
+        messages it receives via the websocket to the stack interface.
 
+        :param stack_interface: The interface object that communicates to the
+            serial port.
+        :type stack_interface: `interface.StackInterface` instance.
+        :param websocket_manager: The websocket manager which keeps track of
+            the websockets.
+        :type websocket_manager: `ws4py.manager.WebSocketManager`.
+    """
     def __init__(self, stack_interface, websocket_manager, *args, **kwargs):
         super(WebsocketHandler, self).__init__(*args, **kwargs)
         self.stacker = stack_interface
         self.manager = websocket_manager
 
     def received_message(self, msg):
+        """
+            Handles messages received via the websocket, so they are coming
+            from the browser.
+        """
         decoded_json = json.loads(str(msg))
         msgtype, msgdata = decoded_json
 
-        print(msg)
-
         if (msgtype == "serial"):
+            # got a serial command, we have to pass this on to the stack object
+
             # check if we have a serial connection.
             if (not self.stacker.is_serial_connected()):
                 self.send(json.dumps(json.dumps(["no_serial"])))
@@ -58,6 +81,9 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
                 cherrypy.log("Failed sending message: {}".format(e))
 
         if (msgtype == "connect_serial"):
+            # we have to connet the stack interface to the right serial port.
+            # if this succeeds we have to broadcast the new serial port to all
+            # the connected websockets.
             res = self.stacker.connect(msgdata["device"])
             if (res):
                 response = ["connect_success",
@@ -84,6 +110,12 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
 
     @classmethod
     def with_parameters(cls, stack_instance, manager):
+        """
+            Factory method to wrap this class for use with the default
+            websocket arguments. This allows passing the `stack_interface` and
+            `manager` arguments to every initialization of the websocket
+            handler.
+        """
         def factory(*args, **kwargs):
             z = cls(stack_instance, manager, *args, **kwargs)
             return z
@@ -91,6 +123,21 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
 
 
 if __name__ == "__main__":
+    # Running as main; should start a server.
+
+    parser = argparse.ArgumentParser(description="Focus Stacking"
+                                     " webinterface.")
+    parser.add_argument('--port', '-p',
+                        help="The port used to listen.",
+                        type=int,
+                        default=8080)
+    parser.add_argument('--host', '-l',
+                        help="The interface on which to listen.",
+                        type=str,
+                        default="127.0.0.1")
+
+    # parse the arguments.
+    args = parser.parse_args()
 
     # set up the interface logger.
     interface_logger = logging.getLogger("interface")
@@ -115,6 +162,8 @@ if __name__ == "__main__":
     stack_interface.start()
     server_tree = FocusStackRoot(stack_interface)
 
+    # create a broadcast function which relays messages received over the
+    # serial port to the websockets via the websocketmanager.
     def broadcaster():
         m = stack_interface.get_message()
         if m:
@@ -128,8 +177,8 @@ if __name__ == "__main__":
                                      broadcaster,
                                      frequency=0.01).subscribe()
 
-    cherrypy.config.update({"server.socket_host": "127.0.0.1",
-                            "server.socket_port": 8080})
+    cherrypy.config.update({"server.socket_host": args.host,
+                            "server.socket_port": args.port})
 
     static_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                  "static")

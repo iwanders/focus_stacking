@@ -11,8 +11,8 @@ msg_type_t = namedtuple("msg_type", ["nop",
                                      "action_stop",
                                      "get_version",
                                      "get_status"])
+# can do msg_type.nop or msg_type.get_config now.
 msg_type = msg_type_t(*range(0, len(msg_type_t._fields)))
-# can do msg_type.nop now.
 
 # Depending on the message type, we interpret the payload as to be this field:
 msg_type_field = {msg_type_t._fields.index("set_config"): "config",
@@ -40,6 +40,8 @@ class Readable:
 
 # Mixin to allow conversion of a ctypes structure to and from a dictionary.
 class Dictionary:
+    # Implement the iterator method such that dict(...) results in the correct
+    # dictionary.
     def __iter__(self):
         for k, t in self._fields_:
             if (issubclass(t, ctypes.Structure)):
@@ -47,6 +49,8 @@ class Dictionary:
             else:
                 yield (k, getattr(self, k))
 
+    # Implement the reverse method, with some special handling for dict's and
+    # lists.
     def from_dict(self, dict_object):
         for k, t in self._fields_:
             set_value = dict_object[k]
@@ -66,7 +70,8 @@ class Dictionary:
         return str(dict(self))
 
 
-# Structs for the various parts in the stacking firmware.
+# Structs for the various parts in the stacking firmware. These correspond to
+# the structures as defined in the header files.
 class ConfigMotorStepper(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("min_width", ctypes.c_uint),
                 ("max_width", ctypes.c_uint),
@@ -105,6 +110,7 @@ class StatusMotorStepper(ctypes.LittleEndianStructure, Dictionary):
 class StatusCameraOptocoupler(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("taking_photo", ctypes.c_bool)]
 
+
 class StatusStackControl(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("current_state", ctypes.c_byte),
                 ("current_sub_state", ctypes.c_byte),
@@ -114,7 +120,8 @@ class StatusStackControl(ctypes.LittleEndianStructure, Dictionary):
                 ("is_stack_finished", ctypes.c_bool),
                 ("is_idle", ctypes.c_bool)]
 
-# The status message for the whole.
+
+# The status message for the whole status message.
 class MsgStatus(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("motor", StatusMotorStepper),
                 ("camera", StatusCameraOptocoupler),
@@ -150,6 +157,7 @@ class _MsgBody(ctypes.Union):
                 ("raw", ctypes.c_byte * (64-4))]
 
 
+# Class which represents all messages. That is; it holds all the structs.
 class Msg(ctypes.LittleEndianStructure, Readable):
     type = msg_type
     _fields_ = [("msg_type", ctypes.c_uint),
@@ -166,7 +174,7 @@ class Msg(ctypes.LittleEndianStructure, Readable):
             payload_text = "-"
         return "<Msg {}: {}>".format(message_field, payload_text)
 
-    # we have to treat the mixin slightly different here, since we there is
+    # We have to treat the mixin slightly different here, since we there is
     # special handling for the message type and thus the body.
     def __iter__(self):
         for k, t in self._fields_:
