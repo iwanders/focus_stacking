@@ -1,0 +1,60 @@
+digraph {
+    //splines=true;
+    sep="+25,25";
+    overlap=scalexy;
+    //nodesep=1;
+    //node [fontsize=15];
+    //edge[weight=0.2];
+    //layout=circo 
+
+    // states
+    start_delay_before_photo;
+    delay_before_photo;
+    start_photo;
+    photo_busy;
+    pause_after_photo;
+    start_delay_after_photo;
+    delay_after_photo;
+    start_movement;
+    movement;
+    pause_after_movement;
+    next_step;
+    halted[label="Halted state"]; // exit point of stacking loop.
+    startstack[label="Start stacking"]; // entry point
+
+    // bold for lambda transitions
+    // dashed for idling on an activity.
+
+    // transitions
+    startstack -> start_delay_before_photo [label="Start"]
+    start_delay_before_photo -> delay_before_photo [style=bold, label="Resets duration"]
+
+    delay_before_photo -> start_photo [label="Delay finished"]
+    delay_before_photo -> delay_before_photo [style=dashed, label="Delaying"]
+
+    start_photo -> photo_busy [style=bold, label="Start photograph"]
+
+    photo_busy -> pause_after_photo [label="Photograph finished"]
+    photo_busy -> photo_busy [style=dashed, label="Photographing"]
+
+
+    pause_after_photo -> pause_after_photo [label="state == should_pause"]
+    pause_after_photo -> start_delay_after_photo [label="state != should_pause"]
+
+    start_delay_after_photo -> delay_after_photo [style=bold, label="Resets duration"]
+
+    delay_after_photo -> delay_after_photo [style=dashed, label="Delaying"]
+    delay_after_photo -> start_movement [label="Delay finished"]
+
+    start_movement -> movement [style=bold, label="Start movement"]
+    movement -> movement [style=dashed, label="Moving"]
+
+    movement -> pause_after_movement [label="Finished moving"]
+
+    pause_after_movement -> pause_after_movement [label="state == should_pause"]
+    pause_after_movement -> next_step [label="state != should_pause"]
+
+    next_step -> start_delay_before_photo [label="More photos"]
+    next_step -> halted [label="Finished"]
+
+}
