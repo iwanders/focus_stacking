@@ -1,0 +1,371 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:custom_components
+LIBS:focus_stacking_schematic-cache
+EELAYER 25 0
+EELAYER END
+$Descr User 7874 5906
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Teensy3_outer U1
+U 1 1 571C8518
+P 1400 1850
+F 0 "U1" H 1750 1750 60  0000 C CNN
+F 1 "Teensy LC" H 1900 1900 60  0000 C CNN
+F 2 "" H 1400 1750 60  0000 C CNN
+F 3 "" H 1400 1750 60  0000 C CNN
+	1    1400 1850
+	1    0    0    -1  
+$EndComp
+$Comp
+L EasyDriver_v4.5 U7
+U 1 1 571C8994
+P 5050 1850
+F 0 "U7" H 4300 1800 60  0000 C CNN
+F 1 "EasyDriver_v4.5" H 4450 1900 60  0000 C CNN
+F 2 "" H 5050 1850 60  0000 C CNN
+F 3 "" H 5050 1850 60  0000 C CNN
+	1    5050 1850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2500 2450 2500 2750
+Wire Wire Line
+	2500 2750 5800 2750
+Wire Wire Line
+	5800 2750 5800 2450
+Wire Wire Line
+	2400 2450 2400 2850
+Wire Wire Line
+	2400 2850 5900 2850
+Wire Wire Line
+	5900 2850 5900 2450
+Wire Wire Line
+	1400 2450 1400 2550
+Text Notes 1000 1700 0    60   ~ 0
+Cut\nVusb\nJumper\n
+$Comp
+L TIL111 U3
+U 1 1 571C8D05
+P 2450 3250
+F 0 "U3" H 2300 3450 70  0000 C CNN
+F 1 "TIL111" H 2400 3550 70  0000 C CNN
+F 2 "" H 2450 3250 60  0000 C CNN
+F 3 "" H 2450 3250 60  0000 C CNN
+	1    2450 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L TIL111 U4
+U 1 1 571C8C99
+P 2450 3650
+F 0 "U4" H 2350 3350 70  0000 C CNN
+F 1 "TIL111" H 2450 3450 70  0000 C CNN
+F 2 "" H 2450 3650 60  0000 C CNN
+F 3 "" H 2450 3650 60  0000 C CNN
+	1    2450 3650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1900 1250 1900 1050
+$Comp
+L R R2
+U 1 1 571C90B8
+P 2000 2850
+F 0 "R2" V 2080 2850 50  0000 C CNN
+F 1 "150" V 2000 2850 50  0000 C CNN
+F 2 "" V 1930 2850 30  0000 C CNN
+F 3 "" H 2000 2850 30  0000 C CNN
+	1    2000 2850
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	2000 2450 2000 2700
+Wire Wire Line
+	2000 3000 2000 3150
+Wire Wire Line
+	2000 3150 2150 3150
+$Comp
+L R R1
+U 1 1 571C9179
+P 700 2850
+F 0 "R1" V 780 2850 50  0000 C CNN
+F 1 "150" V 700 2850 50  0000 C CNN
+F 2 "" V 630 2850 30  0000 C CNN
+F 3 "" H 700 2850 30  0000 C CNN
+	1    700  2850
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	700  3000 700  3550
+Wire Wire Line
+	700  2700 700  1050
+Wire Wire Line
+	700  1050 1900 1050
+$Comp
+L jack_3pin U6
+U 1 1 571C92E1
+P 4300 3350
+F 0 "U6" H 3800 3550 60  0000 C CNN
+F 1 "jack_3pin" H 4600 3550 60  0000 C CNN
+F 2 "" H 4300 3350 60  0000 C CNN
+F 3 "" H 4300 3350 60  0000 C CNN
+	1    4300 3350
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	2150 3350 2050 3350
+Wire Wire Line
+	2050 3350 2050 3850
+Connection ~ 2050 3750
+Wire Wire Line
+	700  3550 2150 3550
+Wire Wire Line
+	2750 3650 3050 3650
+Wire Wire Line
+	3050 3650 3050 3500
+Wire Wire Line
+	3050 3500 3700 3500
+Wire Wire Line
+	2750 3750 3000 3750
+Wire Wire Line
+	3000 3750 3000 3400
+Wire Wire Line
+	3000 3400 3700 3400
+Wire Wire Line
+	2750 3350 2850 3350
+Wire Wire Line
+	2850 3350 2850 3750
+Connection ~ 2850 3750
+Wire Wire Line
+	2750 3250 3100 3250
+Wire Wire Line
+	3100 3250 3100 3300
+Wire Wire Line
+	3100 3300 3700 3300
+$Comp
+L GND #PWR2
+U 1 1 571C9D45
+P 1400 2550
+F 0 "#PWR2" H 1400 2300 50  0001 C CNN
+F 1 "GND" H 1400 2400 50  0000 C CNN
+F 2 "" H 1400 2550 60  0000 C CNN
+F 3 "" H 1400 2550 60  0000 C CNN
+	1    1400 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR4
+U 1 1 571C9DD1
+P 2050 3850
+F 0 "#PWR4" H 2050 3600 50  0001 C CNN
+F 1 "GND" H 2050 3700 50  0000 C CNN
+F 2 "" H 2050 3850 60  0000 C CNN
+F 3 "" H 2050 3850 60  0000 C CNN
+	1    2050 3850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2050 3750 2150 3750
+$Comp
+L GND #PWR6
+U 1 1 571C9EE5
+P 4150 2450
+F 0 "#PWR6" H 4150 2200 50  0001 C CNN
+F 1 "GND" H 4000 2350 50  0000 C CNN
+F 2 "" H 4150 2450 60  0000 C CNN
+F 3 "" H 4150 2450 60  0000 C CNN
+	1    4150 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR8
+U 1 1 571C9F13
+P 5700 2450
+F 0 "#PWR8" H 5700 2200 50  0001 C CNN
+F 1 "GND" H 5700 2300 50  0000 C CNN
+F 2 "" H 5700 2450 60  0000 C CNN
+F 3 "" H 5700 2450 60  0000 C CNN
+	1    5700 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR9
+U 1 1 571C9FE1
+P 5800 1250
+F 0 "#PWR9" H 5800 1000 50  0001 C CNN
+F 1 "GND" H 5950 1200 50  0000 C CNN
+F 2 "" H 5800 1250 60  0000 C CNN
+F 3 "" H 5800 1250 60  0000 C CNN
+	1    5800 1250
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	5800 1250 5800 1300
+$Comp
+L SW_PUSH SW1
+U 1 1 571CA16F
+P 1300 800
+F 0 "SW1" H 1450 910 50  0000 C CNN
+F 1 "Start button" H 1300 1000 50  0000 C CNN
+F 2 "" H 1300 800 60  0000 C CNN
+F 3 "" H 1300 800 60  0000 C CNN
+	1    1300 800 
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1800 1250 1800 800 
+Wire Wire Line
+	1800 800  1600 800 
+$Comp
+L GND #PWR1
+U 1 1 571CA236
+P 1000 800
+F 0 "#PWR1" H 1000 550 50  0001 C CNN
+F 1 "GND" H 1000 650 50  0000 C CNN
+F 2 "" H 1000 800 60  0000 C CNN
+F 3 "" H 1000 800 60  0000 C CNN
+	1    1000 800 
+	1    0    0    -1  
+$EndComp
+$Comp
+L steppermotor U5
+U 1 1 571CA556
+P 3600 950
+F 0 "U5" V 3850 1200 60  0000 C CNN
+F 1 "steppermotor" V 3950 1000 60  0000 C CNN
+F 2 "" H 3600 950 60  0000 C CNN
+F 3 "" H 3600 950 60  0000 C CNN
+	1    3600 950 
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	4250 1300 4250 1200
+Wire Wire Line
+	4250 1200 4100 1200
+Wire Wire Line
+	4100 1100 4350 1100
+Wire Wire Line
+	4350 1100 4350 1300
+Wire Wire Line
+	4100 800  4450 800 
+Wire Wire Line
+	4450 800  4450 1300
+Wire Wire Line
+	4100 700  4550 700 
+Wire Wire Line
+	4550 700  4550 1300
+Wire Wire Line
+	2400 1100 2400 1250
+$Comp
+L GND #PWR5
+U 1 1 571CA964
+P 2200 1100
+F 0 "#PWR5" H 2200 850 50  0001 C CNN
+F 1 "GND" H 2200 950 50  0000 C CNN
+F 2 "" H 2200 1100 60  0000 C CNN
+F 3 "" H 2200 1100 60  0000 C CNN
+	1    2200 1100
+	0    1    1    0   
+$EndComp
+$Comp
+L buzzer U2
+U 1 1 571CA865
+P 2300 850
+F 0 "U2" H 2050 950 60  0000 C CNN
+F 1 "buzzer" H 2150 1050 60  0000 C CNN
+F 2 "" H 2300 850 60  0000 C CNN
+F 3 "" H 2300 850 60  0000 C CNN
+	1    2300 850 
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR10
+U 1 1 571CAEEB
+P 5900 1250
+F 0 "#PWR10" H 5900 1100 50  0001 C CNN
+F 1 "+12V" H 6000 1300 50  0000 C CNN
+F 2 "" H 5900 1250 60  0000 C CNN
+F 3 "" H 5900 1250 60  0000 C CNN
+	1    5900 1250
+	1    0    0    -1  
+$EndComp
+$Comp
+L +3.3V #PWR3
+U 1 1 571CAF65
+P 1500 2450
+F 0 "#PWR3" H 1500 2300 50  0001 C CNN
+F 1 "+3.3V" H 1400 2600 50  0000 C CNN
+F 2 "" H 1500 2450 60  0000 C CNN
+F 3 "" H 1500 2450 60  0000 C CNN
+	1    1500 2450
+	-1   0    0    1   
+$EndComp
+$Comp
+L +3.3V #PWR7
+U 1 1 571CAF95
+P 4250 2450
+F 0 "#PWR7" H 4250 2300 50  0001 C CNN
+F 1 "+3.3V" H 4100 2550 50  0000 C CNN
+F 2 "" H 4250 2450 60  0000 C CNN
+F 3 "" H 4250 2450 60  0000 C CNN
+	1    4250 2450
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	5900 1250 5900 1300
+$Comp
+L +3.3V #PWR?
+U 1 1 571CB4F3
+P 1100 1250
+F 0 "#PWR?" H 1100 1100 50  0001 C CNN
+F 1 "+3.3V" H 950 1350 50  0000 C CNN
+F 2 "" H 1100 1250 60  0000 C CNN
+F 3 "" H 1100 1250 60  0000 C CNN
+	1    1100 1250
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1100 1250 1400 1250
+Text Notes 3650 3050 0    60   ~ 0
+Camera remote control jack.
+Text Notes 3300 2300 0    60   ~ 0
+Connect 3.3v\noutput jumper
+$EndSCHEMATC
