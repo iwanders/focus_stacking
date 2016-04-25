@@ -22,8 +22,8 @@ are controlled by a microcontroller, which in turn is connected to a PC to
 control it.
 
 ## Software
-A webinterface is chosen as the way to present the user with a graphical user
-interface. A webinterface is chosen over a native application because of the
+A webinterface is used to present the user with a graphical user interface.
+A webinterface is chosen over a native application because of the
 increased portability. Python is used to provide a bridge between the
 webinterface and the serial port used to communicate to the microcontroller.
 
@@ -34,18 +34,12 @@ allows for a greatly improved user experience. Additionally, having ample
 resources available ensures that the functionality of the system is not limited
 by hardware constraints.
 
-A [custom class](firmware/motor_stepper.h) was written to perform non-blocking
-stepper motor movement. It differs from other libraries in that it can ramp up
-and down the velocity at the begin and end of the motion and guarantees that the
-desired number of steps is made before the motion is complete (also, it does
-this without floating point calculations).
-
 For the two main components, the motor and the camera, abstract base classes are
 created. The [StackControl](firmware/stack_control.h) class performs all the
 interaction with those objects and is controlled through the
 [StackInterface](firmware/stack_interface.h). Both the StackControl and
 StackInterface class have a `run` method that is called continously and is
-nonblocking.
+nonblocking, these methods perform all desired actions.
 
 The StackControl uses a state machine to control all operations:
 
@@ -53,7 +47,7 @@ The StackControl uses a state machine to control all operations:
 
 This state machine is _always_ used when an action is performed, also when the
 action is just taking a photograph or moving the motor without taking a sequence
-of photographs. In this case of a motor move or a single photograph we enter the
+of photographs. In the case of a motor move or a single photograph we enter the
 pause state after the action is performed. The green arrows indicate a lambda
 transition; the 'start' states are only there to initiate an action, after which
 we continuously check whether the action is finished or still ongoing.
@@ -64,9 +58,16 @@ the configurations of the motor, camera and stacking parameters. Additionally,
 it can report its status at regular intervals and allows retrieval of the
 current configuration. It also allows for starting the stack process with a
 push button and operating the motor and camera without performing a stack
-sequence.
+sequence via the previously mentioned StackControl class and its state-machine.
 
-The steppermotor class optionally depends on the [IntervalTimer][intervaltimer]
+
+A class named [MotorStepper](firmware/motor_stepper.h) was written to perform
+non-blocking stepper motor movement. It differs from other libraries in that it
+can ramp up and down the velocity at the begin and end of the motion and it
+guarantees that the desired number of steps is made before the motion is
+complete (also, it does this without floating point calculations).
+
+The MotorStepper class optionally depends on the [IntervalTimer][intervaltimer]
 library for Teensy, this library allows calling a function at specific time
 intervals. Although tests showed that this was not really required it does
 ensure smooth movement of the motor. The [ElapsedMillis][ElapsedMillis] library
@@ -74,21 +75,21 @@ is also used extensively throughout the firmware.
 
 ### Graphical user interface
 
-At the PC side of the serial port there is also a
-[StackInterface](client/interface.py), but this time it is a Python class.
+At the PC side of the serial port there is another
+[StackInterface](client/interface.py) class, this time written in Python.
 This class maintains two queue's, one for rx and one for tx. It uses a thread to
 write messages to the serial port from a queue and puts messages that are
 received on another queue. Methods are provided to place messages into the queue
-for transmission or retreive a received message from the queue.
+for transmission or retrieve a received message from the queue.
 
-The messages themselves are [defined](client/message.py) using [ctypes][ctypes]
-Structures, these direcly mirror those defined in the header files of the
-firmware.
+The messages themselves are defined in [message.py](client/message.py) using
+[ctypes][ctypes] Structures, these direcly mirror those defined in the header
+files of the firmware.
 
-A [CherryPy][cherrypy] webserver is used to host the website and provide a
+A [CherryPy][cherrypy] webserver is used to host the website, it uses a
 websocket for communication. The websocket mainly acts as a passthrough,
 performing only the necessary type conversion before passing a message along to
-the StackInterface.
+the StackInterface class which transmits the message over the serial port.
 
 The website uses [Bootstrap][bootstrap] for the visual representation, when a
 configuration parameter is changed, it is automatically sent to the firmware.
@@ -100,11 +101,13 @@ the box is colored green, if it does not match the color will be amber.
 
 ## Hardware & Schematic
 The microcontroller used is a [Teensy LC][teensyLC], an
-[EasyDriver][easydriver45] board is used to move the stepper motor. The
-camera is controlled via the wired remote control port on the camera, making a
-photograph with this port requires connecting two wires to focus, subsequently
-connecting the third wire to the other two to make a photograph. This is done
-using two optocouplers to provide optoisolation between the camera and the focus
+[EasyDriver][easydriver45] board is used to move the stepper motor. The camera
+is controlled via the wired remote control port on the camera. Making a
+photograph with this port requires connecting two wires to perform the prefocus
+step, then connecting the third wire to the other two to make a photograph. 
+Although the camera cannot change the focus, the prefocus step is still required
+before a picture can be taken. Two optocouplers are used 'connect' the wires and
+provide optoisolation between the camera and the electronics of the focus
 stacking system.
 
 The complete schematic:
@@ -119,19 +122,20 @@ made. A photograph of the hardware can be seen
 [here](doc/photo/hardware_setup.jpg).
 
 ## Sample result
-If you have read everything so far, you probably don't need an example image to
-have an idea of what the result looks like, but here is one nonetheless.
+If you have taken the time to read everything so far, you probably don't need an
+example image to have an idea of what a result looks like, but here is one
+nonetheless.
 
 A photograph of the Black Garden Ant
 ([Lasius niger][Lasiusniger]) made with this setup, the head is less
-than one millimiter in size. All rights reserved for this photograph.
+than one millimeter in size. All rights reserved for this photograph.
 
 ![Lasius Niger](doc/photo/lasius_niger.png "Lasius Niger")
 
 
 ## License
 
-MIT License, see LICENSE.md.
+MIT License, see [LICENSE.md](LICENSE.md).
 
 Copyright (c) 2016 Ivor Wanders
 
