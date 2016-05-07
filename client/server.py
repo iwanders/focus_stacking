@@ -21,8 +21,9 @@ class FocusStackRoot:
             serial port.
 
     """
-    def __init__(self, stack_interface):
+    def __init__(self, stack_interface, preset_dir):
         self.stack = stack_interface
+        self.preset_dir = preset_dir
 
     @cherrypy.expose
     def ws(self):
@@ -34,6 +35,57 @@ class FocusStackRoot:
     @cherrypy.tools.json_out()
     def get_serial_ports(self):
         return interface.get_potential_ports()
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_preset_list(self):
+        presets = []
+        for f in os.listdir(self.preset_dir):
+            if (f.endswith(".json")):
+                presets.append(f[:-5])
+        return presets
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_preset_content(self, name):
+        preset_path = os.path.join(self.preset_dir, name + ".json")
+
+        if (not os.path.abspath(preset_path).startswith(self.preset_dir)):
+            # if this occurs we try to retrieve something outside the dir.
+            raise cherrypy.HTTPError(403, "Outside of directory...")
+
+        try:
+            with open(preset_path, 'r') as f:
+                data = json.load(f)
+                failed = False
+        except ValueError as e:
+            print("Failed to load preset.")
+            print(e)
+            failed = True
+        if failed:
+            raise cherrypy.HTTPError(500, "Failed to load json preset.")
+        return data
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def set_preset_content(self, name, data):
+        preset_path = os.path.join(self.preset_dir, name + ".json")
+
+        if (not os.path.abspath(preset_path).startswith(self.preset_dir)):
+            # if this occurs we try to retrieve something outside the dir.
+            raise cherrypy.HTTPError(403, "Outside of directory...")
+
+        try:
+            with open(preset_path, 'w') as f:
+                data = json.dump(json.loads(data), f, indent=4, sort_keys=True)
+                failed = False
+        except ValueError as e:
+            print("Failed to save preset.")
+            print(e)
+            failed = True
+        if failed:
+            raise cherrypy.HTTPError(500, "Failed to save json preset.")
+        return self.get_preset_list()
 
 
 class WebsocketHandler(ws4py.websocket.WebSocket):
@@ -60,7 +112,6 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
         """
         decoded_json = json.loads(str(msg))
         msgtype, msgdata = decoded_json
-
         if (msgtype == "serial"):
             # got a serial command, we have to pass this on to the stack object
 
@@ -101,6 +152,10 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
                             self.stacker.get_serial_parameters()]
                 self.send(json.dumps(response))
 
+        if ((msgtype == "set_ui_config") or (msgtype == "get_ui_config")):
+            # echo to all websockets.
+            self.manager.broadcast(msg)
+
     def closed(self, code, reason=None):
         print("Websocket was closed.")
         self.shutdown()
@@ -136,6 +191,11 @@ if __name__ == "__main__":
                         type=str,
                         default="127.0.0.1")
 
+    parser.add_argument('--presetdir', '-d',
+                        help="Folder which holds preset files.",
+                        type=str,
+                        default="./presets/")
+
     # parse the arguments.
     args = parser.parse_args()
 
@@ -150,6 +210,12 @@ if __name__ == "__main__":
     ch.setFormatter(formatter)
     interface_logger.addHandler(ch)
 
+    # create the preset folder if it does not exist:
+    preset_dir = os.path.abspath(args.presetdir)
+    if (not os.path.isdir(preset_dir)):
+        print("Preset folder {} did not exist, creating.".format(preset_dir))
+        os.makedirs(preset_dir)
+
     # Add the websocket requirements.
     cherrypy.tools.websocket = WebSocketTool()
 
@@ -160,7 +226,7 @@ if __name__ == "__main__":
     stack_interface = interface.StackInterface()
     stack_interface.daemon = True
     stack_interface.start()
-    server_tree = FocusStackRoot(stack_interface)
+    server_tree = FocusStackRoot(stack_interface, preset_dir=preset_dir)
 
     # create a broadcast function which relays messages received over the
     # serial port to the websockets via the websocketmanager.

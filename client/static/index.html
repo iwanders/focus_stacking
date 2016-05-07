@@ -22,6 +22,7 @@
         <ul class="nav navbar-nav">
             <!-- <li><a href="#" id="navbar_status">Status</a></li> -->
             <li><a href="#" data-toggle="modal" data-target="#settings_modal" onclick="$('#settings_modal').show();">Settings</a></li>
+            <li><a href="#" data-toggle="modal" data-target="#preset_modal" onclick="$('#preset_modal').show();">Presets</a></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
@@ -40,6 +41,61 @@
 
 
 
+        <div class="modal fade" tabindex="-1" role="dialog" id="preset_modal">
+          <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Presets</h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="list-group" id="preset_list">
+                                <button type="button" class="list-group-item">-</button>
+                            </div>
+                        </div><!-- /.col-lg-6 -->
+
+                        <div class="col-lg-6">
+
+                            <div class="form-group">
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" id="preset_information_heading">Information on Preset</div>
+                                    <div class="panel-body">
+                                    <table class="table">
+                                    <thead>
+                                        <tr> <th>Key</th> <th>Value</th></tr>
+                                    </thead> 
+                                    <tbody id="preset_information">            
+                                    </tbody>
+                                    </table>
+
+    
+
+                                        <div class="input-group" style="width:100%">
+                                            <button class="btn btn-default btn-block" role="button" id="preset_load"><span class="glyphicon glyphicon-save"></span> Load</button>
+                                        </div>
+                                    </div> <!-- / panel body -->
+                                </div> <!-- / panel  -->
+
+                                <div class="input-group has-success" id="preset_name">
+                                    <span class="input-group-addon">name</span>
+                                    <input type="text" class="form-control" >
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" id="preset_name_save"><span class="glyphicon glyphicon-open"></span> Save</button>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div><!-- /.col-lg-6 -->
+                    </div><!-- /.row -->
+                </div> <!-- modal body -->
+            </div>
+          </div>
+        </div>
+
         <div class="modal fade" tabindex="-1" role="dialog" id="information_modal">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -56,7 +112,7 @@
                     </p>
                 </div> <!-- modal body -->
             </div>
-        </div>
+          </div>
         </div>
 
         <div class="modal fade" tabindex="-1" role="dialog" id="settings_modal">

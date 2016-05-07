@@ -91,6 +91,13 @@ Stack.prototype.getSerialStatus = function(){
     this.send("get_serial_status", "");
 }
 
+Stack.prototype.setUIConfig = function(config){
+    this.send("set_ui_config", config);
+};
+Stack.prototype.getUIConfig = function(){
+    this.send("get_ui_config");
+};
+
 Stack.prototype.attachCommandHandler = function (command, fun){
     this.dispatchers[command] = fun;
 }

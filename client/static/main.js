@@ -19,6 +19,8 @@ var current_config = {
                         ui_transmission_ratio:1,
                         ui_stack_move_degrees:0,
                 };
+var preset_name = "";
+var preset_config = {};
 
 var config_element_relations = {
     motor_min_width : {selector:'#motor_min_width input', key: "motor_min_width", parser:parseInt, upload_event:[]},
@@ -52,6 +54,54 @@ function setAllElements(){
     $.each(config_element_relations, function (k, v){
         $(v.selector).val(current_config[v.key]);
         $(v.selector).trigger("change");
+    });
+}
+
+function setUIConfig(){
+    stacker.setUIConfig({"ui_transmission_ratio":current_config["ui_transmission_ratio"],
+                        "ui_stack_move_degrees":current_config["ui_stack_move_degrees"]});
+}
+
+function setPresetList(data){
+    $('#preset_list').empty();
+
+    // create the new items.
+    var style_additives = ""
+    $.each( data, function( key, val ) {
+        // if we are to highlight it.
+        if (val.likely) {
+            style_additives = "alert-success"
+        } else {
+            style_additives = ""
+        }
+        var entry = $('<button type="button" class="list-group-item">' + val + '</button>');
+        entry.data('preset_name', val);
+
+        // this happens when one clicks on the preset.
+        $(entry).on("click", function (){
+            //stacker.connectSerial(val.device);
+            console.log("Click on: " + val);
+            
+            $.getJSON("get_preset_content", {"name":val}, function( data ) {
+                console.log(data);
+                preset_config = data;
+                preset_name = val;
+                $('#preset_information_heading').text("Preset: " + val);
+                var config_html = "";
+                var keys = [];
+                $.each(data, function(key,value){
+                    keys.push(key);
+                });
+                keys.sort();
+                $.each(keys, function (index, config_key) {
+                    var config_value = data[config_key];
+                    config_html = config_html + "<tr><td>" + config_key + "</td><td>" + config_value + "</td>";
+                });
+                $('#preset_load').removeClass("disabled");
+                $('#preset_information').html(config_html);
+            });
+        });
+        entry.appendTo('#preset_list');
     });
 }
 
@@ -113,6 +163,7 @@ $( document ).ready(function() {
             $(v.selector).bind(event_name, function (event){
                 // console.log("Autouplaod");
                 getAllElements();
+                setUIConfig();
                 stacker.serial_set_config(stacker.unflatten_config(current_config));
                 stacker.serial_get_config();
             });
@@ -182,7 +233,7 @@ $( document ).ready(function() {
           } status_t;
         */
         var stack_status = payload.status.stack;
-        console.log("Successfully get_status");
+        //console.log("Successfully get_status");
         if (stack_status.is_idle){
             $('#start_stacking').prop('disabled', false);
             $('#status_progress').removeClass("active");
@@ -260,6 +311,7 @@ $( document ).ready(function() {
         $('#firmware_version').html(hashstring);
 
         stacker.serial_get_config();
+        stacker.getUIConfig();
     });
 
     stacker.attachCommandHandler("serial_get_config", function (command, payload) {
@@ -269,6 +321,13 @@ $( document ).ready(function() {
         $.extend(current_config, stacker.flatten_config(cfg))
         setAllElements();
     });
+    stacker.attachCommandHandler("set_ui_config", function(command, payload){
+        current_config["ui_transmission_ratio"] = payload["ui_transmission_ratio"];
+        current_config["ui_stack_move_degrees"] = payload["ui_stack_move_degrees"];
+        // setAllElements();
+        setAllElements();
+    });
+
 
     stacker.attachCommandHandler("onopen", function (){
         $('#no_websocket_error').hide();
@@ -276,6 +335,10 @@ $( document ).ready(function() {
 
     stacker.attachCommandHandler("onclose", function (){
         $('#no_websocket_error').show();
+    });
+
+    stacker.attachCommandHandler("get_ui_config", function(command, payload){
+        setUIConfig();
     });
 
     // Deal with the dropdown
@@ -355,6 +418,7 @@ $( document ).ready(function() {
     $('#interface_setting_transmission_ratio').blur( function (event){
         getAllElements();
         $(this).trigger("change");
+        setUIConfig();
     });
 
     $('#move_degrees input').on("input", function (){
@@ -371,6 +435,36 @@ $( document ).ready(function() {
         console.log(event);
         stacker.serial_action_motor(-current_config["stack_move_steps"]);
         this.blur();
+    });
+
+
+    // preset code...
+    $('#preset_modal').bind('show.bs.modal', function(){
+        $.getJSON("get_preset_list", function( data ) {
+            // clear the current
+            setPresetList(data);
+        });
+    });
+
+    $('#preset_name_save').click(function (){
+        var name = $('#preset_name input')[0].value;
+        console.log("Saving as: " + name);
+        $.post("set_preset_content", {"name":name, "data":JSON.stringify(current_config)}, function( data ) {
+            setPresetList(data);
+            $('#preset_name input')[0].value = "";
+        });
+    });
+    $('#preset_load').addClass("disabled");
+    $('#preset_load').click(function(){
+        // overwrite current config, then call set all elements.
+        $.each(current_config, function (key, value){
+            current_config[key] = preset_config[key];
+        });
+        setAllElements();
+        stacker.serial_set_config(stacker.unflatten_config(current_config));
+        stacker.setUIConfig({"ui_transmission_ratio":current_config["ui_transmission_ratio"],
+                        "ui_stack_move_degrees":current_config["ui_stack_move_degrees"]});
+        stacker.serial_get_config();
     });
 
 });
