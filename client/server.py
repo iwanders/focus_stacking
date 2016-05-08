@@ -47,6 +47,19 @@ class FocusStackRoot:
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
+    def del_preset(self, name):
+        preset_path = os.path.join(self.preset_dir, name + ".json")
+
+        if (not os.path.abspath(preset_path).startswith(self.preset_dir)):
+            # if this occurs we try to retrieve something outside the dir.
+            raise cherrypy.HTTPError(403, "Outside of directory...")
+
+        os.unlink(preset_path)
+
+        return self.get_preset_list()
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
     def get_preset_content(self, name):
         preset_path = os.path.join(self.preset_dir, name + ".json")
 

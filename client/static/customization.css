@@ -7,3 +7,7 @@ body {
 .setting_description {
 	color: gray;
 }
+
+#preset_modal .modal-dialog{
+	width:50%;
+}

@@ -57,47 +57,52 @@ function setAllElements(){
     });
 }
 
+function setPresetInfo(data, name, enabled){
+    console.log(data);
+    preset_config = data;
+    preset_name = name;
+    var config_html = "";
+    var keys = [];
+    $.each(data, function(key,value){
+        keys.push(key);
+    });
+    keys.sort();
+    $.each(keys, function (index, config_key) {
+        var config_value = data[config_key];
+        config_html = config_html + "<tr><td>" + config_key + "</td><td>" + config_value + "</td>";
+    });
+    $('#preset_information').html(config_html);
+    if (enabled){
+        $('#preset_del').show();
+        $('#preset_information_heading').text("Preset: " + name);
+        $('#preset_load').removeClass("disabled");
+    } else {
+        $('#preset_del').hide();
+        $('#preset_information_heading').text("No preset selected");
+        $('#preset_load').addClass("disabled");
+    }
+}
+
 function setPresetList(data){
     $('#preset_list').empty();
 
     // create the new items.
     var style_additives = ""
     $.each( data, function( key, val ) {
-        // if we are to highlight it.
-        if (val.likely) {
-            style_additives = "alert-success"
-        } else {
-            style_additives = ""
-        }
         var entry = $('<button type="button" class="list-group-item">' + val + '</button>');
-        entry.data('preset_name', val);
-
         // this happens when one clicks on the preset.
         $(entry).on("click", function (){
             //stacker.connectSerial(val.device);
             console.log("Click on: " + val);
-            
             $.getJSON("get_preset_content", {"name":val}, function( data ) {
-                console.log(data);
-                preset_config = data;
-                preset_name = val;
-                $('#preset_information_heading').text("Preset: " + val);
-                var config_html = "";
-                var keys = [];
-                $.each(data, function(key,value){
-                    keys.push(key);
-                });
-                keys.sort();
-                $.each(keys, function (index, config_key) {
-                    var config_value = data[config_key];
-                    config_html = config_html + "<tr><td>" + config_key + "</td><td>" + config_value + "</td>";
-                });
-                $('#preset_load').removeClass("disabled");
-                $('#preset_information').html(config_html);
+                setPresetInfo(data, val, true);
             });
         });
         entry.appendTo('#preset_list');
     });
+    if (jQuery.isEmptyObject(data)){
+        $('#preset_list').text("No presets found.");
+    }
 }
 
 /*
@@ -123,6 +128,8 @@ function setPresetList(data){
 $( document ).ready(function() {
     console.log( "ready!" );
     stacker.open($(location).attr('host') + "/ws");
+
+    setPresetInfo({}, "", false);
 
     $.each(config_element_relations, function (k, v){
         $(v.selector).bind('input', function () {
@@ -449,6 +456,17 @@ $( document ).ready(function() {
         setAllElements();
         stacker.serial_set_config(stacker.unflatten_config(current_config));
         stacker.serial_get_config();
+        $('#preset_modal').modal('toggle');
+    });
+
+    $('#preset_del').click(function(){
+        console.log("Deleting : " + preset_name);
+        if (preset_name != ""){
+            $.post("del_preset", {"name":preset_name}, function( data ) {
+                setPresetList(data);
+                setPresetInfo({}, "", false);
+            });
+        }
     });
 
 });
