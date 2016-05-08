@@ -23,15 +23,15 @@ var preset_name = "";
 var preset_config = {};
 
 var config_element_relations = {
-    motor_min_width : {selector:'#motor_min_width input', key: "motor_min_width", parser:parseInt, upload_event:[]},
-    motor_max_width : {selector:'#motor_max_width input', key: "motor_max_width", parser:parseInt, upload_event:[]},
-    motor_ramp_length : {selector:'#motor_ramp_length input', key: "motor_ramp_length", parser:parseInt, upload_event:[]},
+    motor_min_width : {selector:'#motor_min_width input', key: "motor_min_width", parser:parseInt, upload_event:["blur"]},
+    motor_max_width : {selector:'#motor_max_width input', key: "motor_max_width", parser:parseInt, upload_event:["blur"]},
+    motor_ramp_length : {selector:'#motor_ramp_length input', key: "motor_ramp_length", parser:parseInt, upload_event:["blur"]},
 
-    camera_shutter_duration : {selector:'#camera_shutter_duration input', key: "camera_shutter_duration", parser:parseInt, upload_event:[]},
-    camera_focus_duration : {selector:'#camera_focus_duration input', key: "camera_focus_duration", parser:parseInt, upload_event:[]},
+    camera_shutter_duration : {selector:'#camera_shutter_duration input', key: "camera_shutter_duration", parser:parseInt, upload_event:["blur"]},
+    camera_focus_duration : {selector:'#camera_focus_duration input', key: "camera_focus_duration", parser:parseInt, upload_event:["blur"]},
 
     interface_status_interval : {selector:'#interface_status_interval input', key: "interface_status_interval", parser:parseInt, upload_event:["blur"]},
-    interface_ui_transmission_ratio : {selector:'#interface_setting_transmission_ratio ', key: "interface_ui_transmission_ratio", parser:parseFloat},
+    interface_ui_transmission_ratio : {selector:'#interface_setting_transmission_ratio ', key: "interface_ui_transmission_ratio", parser:parseFloat, upload_event:["blur"]},
 
     stack_stack_count : {selector:'#stack_count input', key: "stack_stack_count", parser:parseInt, upload_event:["blur"]},
     stack_delay_before_photo : {selector:'#stack_delay_before_photo input', key: "stack_delay_before_photo", parser:parseInt, upload_event:["blur"]},
@@ -227,7 +227,7 @@ $( document ).ready(function() {
           } status_t;
         */
         var stack_status = payload.status.stack;
-        console.log("Successfully get_status");
+        // console.log("Successfully get_status");
         if (stack_status.is_idle){
             $('#start_stacking').prop('disabled', false);
             $('#status_progress').removeClass("active");
@@ -358,20 +358,22 @@ $( document ).ready(function() {
         setAllElements();
     });
 
+    /*
     $('#motor_config_upload').click(function (event){
         console.log(event);
         getAllElements();
         stacker.serial_set_config(stacker.unflatten_config(current_config));
         stacker.serial_get_config();
         this.blur();
-    });
+    });*/
 
+    /*
     $('#camera_config_upload').click(function (event){
         getAllElements();
         stacker.serial_set_config(stacker.unflatten_config(current_config));
         stacker.serial_get_config();
         this.blur();
-    });
+    }); */
 
 
     $('#motor_config_move').click(function (event){
@@ -398,14 +400,16 @@ $( document ).ready(function() {
         this.blur();
     });
 
+    /*
     $('#interface_setting_transmission_ratio').blur( function (event){
         getAllElements();
         $(this).trigger("change");
-    });
+    });*/
 
+    /*
     $('#move_degrees input').on("input", function (){
         current_config["stack_move_steps"] = current_config["ui_stack_move_degrees"] * current_config["interface_ui_transmission_ratio"];
-    });
+    });*/
 
 
     $('#stack_control_move_left').click(function (event){
