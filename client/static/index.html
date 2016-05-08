@@ -132,7 +132,7 @@
 
 
                     <div class="tab-content">
-
+                        <p></p>
 
                         <div role="tabpanel" class="tab-pane active" id="interface_settings">
                             <div class="panel panel-default">
@@ -164,6 +164,36 @@
                                             </div>
                                         </p>
                                     </div>
+                                </div>
+                            </div><!-- end panel -->
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Buzzer</div>
+                                <div class="panel-body">
+                                    <p>
+                                        The buzzer can be used to create an audible notification when the stack sequence has been finished.
+                                    </p>
+
+                                    <div class="form-group">
+                                        <p class="setting_description">
+                                            This setting determines the frequency of the tone emitted by the buzzer in Hertz.
+                                            <div class="input-group" id="interface_buzzer_frequency">
+                                                <span class="input-group-addon">buzzer_frequency</span>
+                                                <input type="number" class="form-control"   min="0" max="65535" />
+                                                <span class="input-group-addon">Hz</span>
+                                            </div>
+                                        </p>
+                                        <p class="setting_description">
+                                            This setting determines the duration of the tone emitted by the buzzer in milliseconds. The tone can be disabled by setting the duration to zero.
+                                            <div class="input-group"  id="interface_buzzer_duration">
+                                                <span class="input-group-addon">buzzer_duration</span>
+                                                <input type="number" class="form-control" min="0" max="65535"/>
+                                                <span class="input-group-addon">ms</span>
+                                            </div>
+                                        </p>
+
+                                    </div>
+
                                 </div>
                             </div><!-- end panel -->
                         </div>

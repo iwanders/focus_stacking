@@ -142,6 +142,8 @@ Stack.prototype.flatten_config = function (cfg) {
     flat_config["stack_move_steps"] = cfg.stack.move_steps;
 
     flat_config["interface_status_interval"] = cfg.interface.status_interval;
+    flat_config["interface_buzzer_frequency"] = cfg.interface.buzzer_frequency;
+    flat_config["interface_buzzer_duration"] = cfg.interface.buzzer_duration;
     flat_config["interface_ui_transmission_ratio"] = cfg.interface.ui_transmission_ratio;
 
     return flat_config;
@@ -163,6 +165,8 @@ Stack.prototype.unflatten_config = function (flat_config) {
 
     cfg.interface.status_interval = flat_config["interface_status_interval"];
     cfg.interface.ui_transmission_ratio = flat_config["interface_ui_transmission_ratio"];
+    cfg.interface.buzzer_frequency = flat_config["interface_buzzer_frequency"];
+    cfg.interface.buzzer_duration = flat_config["interface_buzzer_duration"];
 
     return cfg;
 }

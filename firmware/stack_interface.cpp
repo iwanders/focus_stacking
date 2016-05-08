@@ -41,11 +41,18 @@ void StackInterface::run() {
   }
 
   // check if we need to start with the start button.
-  if (digitalRead(start_stack_pin_) == LOW){
+  if (digitalRead(start_stack_pin_) == LOW) {
     setConfigs();
     if ((stack_->isIdle())) {
       stack_->stack();
-    }    
+      busy_stacking_ = true;
+    }
+  }
+  if (busy_stacking_ && stack_->isStackFinished()) {
+    busy_stacking_ = false;
+    if (buzzer_duration_ != 0) {
+      tone(buzzer_pin_, buzzer_frequency_, buzzer_duration_);
+    }
   }
 }
 
@@ -121,6 +128,7 @@ void StackInterface::processCommand(const msg_t* msg) {
         setConfigs();
         if ((stack_->isIdle())) {
           stack_->stack();
+          busy_stacking_ = true;
         }
       break;
 
@@ -132,6 +140,8 @@ void StackInterface::processCommand(const msg_t* msg) {
 
     case action_stop:
         stack_->stop();
+        noTone(buzzer_pin_);
+        busy_stacking_ = false;
       break;
 
     case get_version: {

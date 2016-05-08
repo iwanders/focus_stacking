@@ -155,7 +155,8 @@ class StackControl{
   }
 
   status_t getStatus() {
-    return {state_, sub_state_, current_step_, stack_count_, (uint32_t) duration_, isStackFinished(), isIdle()};
+    return {state_, sub_state_, current_step_, stack_count_,
+            (uint32_t) duration_, isStackFinished(), isIdle()};
   }
 
 

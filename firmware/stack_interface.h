@@ -80,6 +80,8 @@ class StackInterface{
   // config struct for this class.
   typedef struct {
     uint32_t status_interval;
+    uint16_t buzzer_frequency;
+    uint16_t buzzer_duration;
     uint32_t ui_transmission_ratio;
   } config_t;
 
@@ -145,13 +147,26 @@ class StackInterface{
     ui_transmission_ratio_ = ui_transmission_ratio;
   }
 
+  // set the buzzer frequency as passed to the tone function..
+  void setBuzzerFrequency(uint16_t buzzer_frequency) {
+    buzzer_frequency_ = buzzer_frequency;
+  }
+  // set the buzzer duration in milliseconds.
+  void setBuzzerDuration(uint16_t buzzer_duration) {
+    buzzer_duration_ = buzzer_duration;
+  }
   // Load configuration from a config struct.
   void setConfig(config_t config) {
     setStatusInterval(config.status_interval);
     setUITransmissionRatio(config.ui_transmission_ratio);
+    setBuzzerFrequency(config.buzzer_frequency);
+    setBuzzerDuration(config.buzzer_duration);
   }
   config_t getConfig() {
-    return {status_interval_, ui_transmission_ratio_};
+    return {status_interval_,
+            buzzer_frequency_,
+            buzzer_duration_,
+            ui_transmission_ratio_};
   }
 
   // should be called often to process serial input and the like.
@@ -160,9 +175,14 @@ class StackInterface{
   // sets the stored configs in the StackInterface to those of the components.
   void retrieveConfigs();
 
-  void setStartStackPin(uint8_t start_stack_pin){
+  void setStartStackPin(uint8_t start_stack_pin) {
     start_stack_pin_ = start_stack_pin;
     pinMode(start_stack_pin_, INPUT_PULLUP);
+  }
+
+  void setBuzzerPin(uint8_t buzzer_pin) {
+    buzzer_pin_ = buzzer_pin;
+    pinMode(buzzer_pin_, OUTPUT);
   }
 
  protected:
@@ -178,12 +198,16 @@ class StackInterface{
 
   // state
   elapsedMillis duration_;
+  bool busy_stacking_;
 
   uint32_t status_interval_;
+  uint16_t buzzer_duration_;
+  uint16_t buzzer_frequency_;
   uint32_t ui_transmission_ratio_;
 
   // pin etc.
   uint8_t start_stack_pin_;
+  uint8_t buzzer_pin_;
 
   // Emit a status over the serial port
   void sendStatus();

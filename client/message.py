@@ -92,6 +92,8 @@ class ConfigStackControl(ctypes.LittleEndianStructure, Dictionary):
 
 class ConfigStackInterface(ctypes.LittleEndianStructure, Dictionary):
     _fields_ = [("status_interval", ctypes.c_uint),
+                ("buzzer_frequency", ctypes.c_uint16),
+                ("buzzer_duration", ctypes.c_uint16),
                 ("ui_transmission_ratio", ctypes.c_float)]
 
 

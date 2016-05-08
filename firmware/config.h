@@ -80,9 +80,18 @@
 // The default transmission ratio that is stored for the UI.
 // This is not used for calculation of the rotations.
 // 0x3F800000 = 1.0 as float
-// import struct; 
+// import struct;
 // z = struct.pack('>f', 1.0)
 // print("0x" + ("{:0>2X}"*4).format(*[b for b in z]))
 #define INTERFACE_UI_DEFAULT_TRANSMISSION_RATIO 0x3F800000
+
+// The pin to which the buzzer is connected.
+#define INTERFACE_BUZZER_PIN 16
+
+// The tone the buzzer emits by default when stack sequence is finished. In Hz.
+#define INTERFACE_DEFAULT_BUZZER_FREQUENCY 500
+
+// The duration of the tone when the stack sequence is finished. In ms.
+#define INTERFACE_DEFAULT_BUZZER_DURATION 3000
 
 #endif  // FIRMWARE_CONFIG_H_

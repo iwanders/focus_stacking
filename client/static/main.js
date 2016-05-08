@@ -16,6 +16,8 @@ var current_config = {
 
                         interface_status_interval: 100,
                         interface_ui_transmission_ratio:1, // for sake of simplicity also stored by the firmware.
+                        interface_buzzer_frequency:1000,
+                        interface_buzzer_duration:1000,
 
                         ui_stack_move_degrees:0,
                 };
@@ -31,6 +33,8 @@ var config_element_relations = {
     camera_focus_duration : {selector:'#camera_focus_duration input', key: "camera_focus_duration", parser:parseInt, upload_event:["blur"]},
 
     interface_status_interval : {selector:'#interface_status_interval input', key: "interface_status_interval", parser:parseInt, upload_event:["blur"]},
+    interface_buzzer_frequency : {selector:'#interface_buzzer_frequency input', key: "interface_buzzer_frequency", parser:parseInt, upload_event:["blur"]},
+    interface_buzzer_duration : {selector:'#interface_buzzer_duration input', key: "interface_buzzer_duration", parser:parseInt, upload_event:["blur"]},
     interface_ui_transmission_ratio : {selector:'#interface_setting_transmission_ratio ', key: "interface_ui_transmission_ratio", parser:parseFloat, upload_event:["blur"]},
 
     stack_stack_count : {selector:'#stack_count input', key: "stack_stack_count", parser:parseInt, upload_event:["blur"]},
@@ -46,6 +50,8 @@ function getAllElements(){
         current_config[v.key] = v.parser($(v.selector).val());
     });
     current_config["interface_status_interval"] = Math.max(100, current_config["interface_status_interval"]); // enforce minimum delay on update interval.
+    current_config["interface_buzzer_duration"] = Math.min(65535, current_config["interface_buzzer_duration"]);
+    current_config["interface_buzzer_frequency"] = Math.min(65535, current_config["interface_buzzer_frequency"]);
     current_config["stack_move_steps"] = Math.round(current_config["ui_stack_move_degrees"] * current_config["interface_ui_transmission_ratio"]);
 }
 
@@ -412,11 +418,12 @@ $( document ).ready(function() {
         getAllElements();
         $(this).trigger("change");
     });*/
-
     /*
     $('#move_degrees input').on("input", function (){
         current_config["stack_move_steps"] = current_config["ui_stack_move_degrees"] * current_config["interface_ui_transmission_ratio"];
-    });*/
+        this.blur();
+    });
+    */
 
 
     $('#stack_control_move_left').click(function (event){
