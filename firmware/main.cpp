@@ -83,6 +83,8 @@ extern "C" int main(void) {
   interface.setUITransmissionRatio(INTERFACE_UI_DEFAULT_TRANSMISSION_RATIO);
 
   interface.retrieveConfigs();
+
+  stacker.stop();
   while (true) {
     stacker.run();
     interface.run();
