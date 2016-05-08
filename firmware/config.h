@@ -77,4 +77,12 @@
 // The pin which is pulled to ground when the stacking should be started.
 #define INTERFACE_START_STACK_PIN 22
 
+// The default transmission ratio that is stored for the UI.
+// This is not used for calculation of the rotations.
+// 0x3F800000 = 1.0 as float
+// import struct; 
+// z = struct.pack('>f', 1.0)
+// print("0x" + ("{:0>2X}"*4).format(*[b for b in z]))
+#define INTERFACE_UI_DEFAULT_TRANSMISSION_RATIO 0x3F800000
+
 #endif  // FIRMWARE_CONFIG_H_

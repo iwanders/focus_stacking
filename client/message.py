@@ -91,7 +91,8 @@ class ConfigStackControl(ctypes.LittleEndianStructure, Dictionary):
 
 
 class ConfigStackInterface(ctypes.LittleEndianStructure, Dictionary):
-    _fields_ = [("status_interval", ctypes.c_uint)]
+    _fields_ = [("status_interval", ctypes.c_uint),
+                ("ui_transmission_ratio", ctypes.c_float)]
 
 
 # A message config consists of this:

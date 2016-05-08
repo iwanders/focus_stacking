@@ -152,10 +152,6 @@ class WebsocketHandler(ws4py.websocket.WebSocket):
                             self.stacker.get_serial_parameters()]
                 self.send(json.dumps(response))
 
-        if ((msgtype == "set_ui_config") or (msgtype == "get_ui_config")):
-            # echo to all websockets.
-            self.manager.broadcast(msg)
-
     def closed(self, code, reason=None):
         print("Websocket was closed.")
         self.shutdown()

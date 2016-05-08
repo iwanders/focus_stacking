@@ -91,13 +91,6 @@ Stack.prototype.getSerialStatus = function(){
     this.send("get_serial_status", "");
 }
 
-Stack.prototype.setUIConfig = function(config){
-    this.send("set_ui_config", config);
-};
-Stack.prototype.getUIConfig = function(){
-    this.send("get_ui_config");
-};
-
 Stack.prototype.attachCommandHandler = function (command, fun){
     this.dispatchers[command] = fun;
 }
@@ -149,6 +142,7 @@ Stack.prototype.flatten_config = function (cfg) {
     flat_config["stack_move_steps"] = cfg.stack.move_steps;
 
     flat_config["interface_status_interval"] = cfg.interface.status_interval;
+    flat_config["interface_ui_transmission_ratio"] = cfg.interface.ui_transmission_ratio;
 
     return flat_config;
 }
@@ -168,6 +162,7 @@ Stack.prototype.unflatten_config = function (flat_config) {
     cfg.stack.move_steps = flat_config["stack_move_steps"];
 
     cfg.interface.status_interval = flat_config["interface_status_interval"];
+    cfg.interface.ui_transmission_ratio = flat_config["interface_ui_transmission_ratio"];
 
     return cfg;
 }

@@ -15,8 +15,8 @@ var current_config = {
                         stack_move_steps: 100,
 
                         interface_status_interval: 100,
+                        interface_ui_transmission_ratio:1, // for sake of simplicity also stored by the firmware.
 
-                        ui_transmission_ratio:1,
                         ui_stack_move_degrees:0,
                 };
 var preset_name = "";
@@ -31,6 +31,7 @@ var config_element_relations = {
     camera_focus_duration : {selector:'#camera_focus_duration input', key: "camera_focus_duration", parser:parseInt, upload_event:[]},
 
     interface_status_interval : {selector:'#interface_status_interval input', key: "interface_status_interval", parser:parseInt, upload_event:["blur"]},
+    interface_ui_transmission_ratio : {selector:'#interface_setting_transmission_ratio ', key: "interface_ui_transmission_ratio", parser:parseFloat},
 
     stack_stack_count : {selector:'#stack_count input', key: "stack_stack_count", parser:parseInt, upload_event:["blur"]},
     stack_delay_before_photo : {selector:'#stack_delay_before_photo input', key: "stack_delay_before_photo", parser:parseInt, upload_event:["blur"]},
@@ -38,7 +39,6 @@ var config_element_relations = {
 
     ui_stack_move_degrees : {selector:'#move_degrees input', key: "ui_stack_move_degrees", parser:parseInt, upload_event:["blur"]},
 
-    ui_transmission_ratio : {selector:'#interface_setting_transmission_ratio ', key: "ui_transmission_ratio", parser:parseFloat},
 }
 
 function getAllElements(){
@@ -46,20 +46,15 @@ function getAllElements(){
         current_config[v.key] = v.parser($(v.selector).val());
     });
     current_config["interface_status_interval"] = Math.max(100, current_config["interface_status_interval"]); // enforce minimum delay on update interval.
-    current_config["stack_move_steps"] = Math.round(current_config["ui_stack_move_degrees"] * current_config["ui_transmission_ratio"]);
+    current_config["stack_move_steps"] = Math.round(current_config["ui_stack_move_degrees"] * current_config["interface_ui_transmission_ratio"]);
 }
 
 function setAllElements(){
-    current_config["ui_stack_move_degrees"] = Math.round(current_config["stack_move_steps"] * 1.0/current_config["ui_transmission_ratio"]);
+    current_config["ui_stack_move_degrees"] = Math.round(current_config["stack_move_steps"] * 1.0/current_config["interface_ui_transmission_ratio"]);
     $.each(config_element_relations, function (k, v){
         $(v.selector).val(current_config[v.key]);
         $(v.selector).trigger("change");
     });
-}
-
-function setUIConfig(){
-    stacker.setUIConfig({"ui_transmission_ratio":current_config["ui_transmission_ratio"],
-                        "ui_stack_move_degrees":current_config["ui_stack_move_degrees"]});
 }
 
 function setPresetList(data){
@@ -163,7 +158,6 @@ $( document ).ready(function() {
             $(v.selector).bind(event_name, function (event){
                 // console.log("Autouplaod");
                 getAllElements();
-                setUIConfig();
                 stacker.serial_set_config(stacker.unflatten_config(current_config));
                 stacker.serial_get_config();
             });
@@ -233,7 +227,7 @@ $( document ).ready(function() {
           } status_t;
         */
         var stack_status = payload.status.stack;
-        //console.log("Successfully get_status");
+        console.log("Successfully get_status");
         if (stack_status.is_idle){
             $('#start_stacking').prop('disabled', false);
             $('#status_progress').removeClass("active");
@@ -311,7 +305,6 @@ $( document ).ready(function() {
         $('#firmware_version').html(hashstring);
 
         stacker.serial_get_config();
-        stacker.getUIConfig();
     });
 
     stacker.attachCommandHandler("serial_get_config", function (command, payload) {
@@ -319,12 +312,6 @@ $( document ).ready(function() {
         var cfg = payload["config"];
         console.log("Got config");
         $.extend(current_config, stacker.flatten_config(cfg))
-        setAllElements();
-    });
-    stacker.attachCommandHandler("set_ui_config", function(command, payload){
-        current_config["ui_transmission_ratio"] = payload["ui_transmission_ratio"];
-        current_config["ui_stack_move_degrees"] = payload["ui_stack_move_degrees"];
-        // setAllElements();
         setAllElements();
     });
 
@@ -335,10 +322,6 @@ $( document ).ready(function() {
 
     stacker.attachCommandHandler("onclose", function (){
         $('#no_websocket_error').show();
-    });
-
-    stacker.attachCommandHandler("get_ui_config", function(command, payload){
-        setUIConfig();
     });
 
     // Deal with the dropdown
@@ -418,11 +401,10 @@ $( document ).ready(function() {
     $('#interface_setting_transmission_ratio').blur( function (event){
         getAllElements();
         $(this).trigger("change");
-        setUIConfig();
     });
 
     $('#move_degrees input').on("input", function (){
-        current_config["stack_move_steps"] = current_config["ui_stack_move_degrees"] * current_config["ui_transmission_ratio"];
+        current_config["stack_move_steps"] = current_config["ui_stack_move_degrees"] * current_config["interface_ui_transmission_ratio"];
     });
 
 
@@ -462,8 +444,6 @@ $( document ).ready(function() {
         });
         setAllElements();
         stacker.serial_set_config(stacker.unflatten_config(current_config));
-        stacker.setUIConfig({"ui_transmission_ratio":current_config["ui_transmission_ratio"],
-                        "ui_stack_move_degrees":current_config["ui_stack_move_degrees"]});
         stacker.serial_get_config();
     });
 

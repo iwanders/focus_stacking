@@ -199,6 +199,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Control Focus Stacking.")
     parser.add_argument('--port', '-p', help="The serial port to connect to.",
                         default="/dev/ttyACM0")
+    parser.add_argument('--verbose', '-v', help="Print all communication.",
+                        action="store_true", default=False)
 
     subparsers = parser.add_subparsers(dest="command")
 
@@ -231,12 +233,16 @@ if __name__ == "__main__":
     # create the interface and connect to a serial port
     a = StackInterface()
     a.connect(args.port)
-    a.start() # start the interface
+    a.start()  # start the interface
 
     # we are retrieving something.
     if (args.command.startswith("get_")):
+        if (args.verbose):
+            print("Sending: {}".format(bytes(msg)))
         a.put_message(msg)
         m = a.wait_for_message()
+        if (args.verbose):
+            print("Retrieved: {}".format(bytes(m)))
         print(m)
         a.stop()
         a.join()
@@ -250,6 +256,8 @@ if __name__ == "__main__":
             d = {fieldname: json.loads(args.config)}
             msg.from_dict(d)
         print("Sending {}".format(msg))
+        if (args.verbose):
+            print("Sending: {}".format(bytes(msg)))
 
         # send the message and wait until it is really gone.
         a.put_message(msg)

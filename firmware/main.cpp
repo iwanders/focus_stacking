@@ -75,6 +75,7 @@ extern "C" int main(void) {
 
   interface.setStatusInterval(INTERFACE_DEFAULT_STATUS_INTERVAL);
   interface.setStartStackPin(INTERFACE_START_STACK_PIN);
+  interface.setUITransmissionRatio(INTERFACE_UI_DEFAULT_TRANSMISSION_RATIO);
 
   interface.retrieveConfigs();
   while (true) {

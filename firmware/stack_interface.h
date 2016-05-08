@@ -80,6 +80,7 @@ class StackInterface{
   // config struct for this class.
   typedef struct {
     uint32_t status_interval;
+    uint32_t ui_transmission_ratio;
   } config_t;
 
   // A config message which holds all config structs for all classess.
@@ -139,12 +140,18 @@ class StackInterface{
     status_interval_ = status_interval;
   }
 
+  // set the interval by which we should emit status messages, in milliseconds.
+  void setUITransmissionRatio(uint32_t ui_transmission_ratio) {
+    ui_transmission_ratio_ = ui_transmission_ratio;
+  }
+
   // Load configuration from a config struct.
   void setConfig(config_t config) {
     setStatusInterval(config.status_interval);
+    setUITransmissionRatio(config.ui_transmission_ratio);
   }
   config_t getConfig() {
-    return {status_interval_};
+    return {status_interval_, ui_transmission_ratio_};
   }
 
   // should be called often to process serial input and the like.
@@ -171,7 +178,9 @@ class StackInterface{
 
   // state
   elapsedMillis duration_;
+
   uint32_t status_interval_;
+  uint32_t ui_transmission_ratio_;
 
   // pin etc.
   uint8_t start_stack_pin_;
