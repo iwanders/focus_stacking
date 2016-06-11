@@ -98,7 +98,7 @@ class StackInterface(threading.Thread):
         # try to read message from serial port
         try:
             if (self.ser.inWaiting()):
-                buffer = bytearray(64)
+                buffer = bytearray(self.packet_size)
                 d = self.ser.readinto(buffer)
 
                 # Did we get the correct number of bytes? If so queue it.
