@@ -121,6 +121,7 @@ class StackInterface(threading.Thread):
 
         if (self.ser is None):
             logging.warn("Trying to send on a closed serial port.")
+            return
 
         try:
             logger.debug("Processing {}".format(msg))
