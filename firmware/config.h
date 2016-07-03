@@ -72,7 +72,7 @@
 #define STACK_DEFAULT_STACK_COUNT 5
 
 // The interval in milliseconds between status updates from the firmware.
-#define INTERFACE_DEFAULT_STATUS_INTERVAL 100
+#define INTERFACE_DEFAULT_STATUS_INTERVAL 1000
 
 // The pin which is pulled to ground when the stacking should be started.
 #define INTERFACE_START_STACK_PIN 22

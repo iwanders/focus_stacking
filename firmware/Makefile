@@ -4,7 +4,7 @@ SHELL := /bin/bash
 TARGET = main
 
 # Path to your arduino installation
-ARDUINOPATH ?= ../../../../Code/teensy/arduino-1.6.5/
+ARDUINOPATH ?= ../../../../Code/teensy/arduino-1.6.9/
 
 # configurable options
 OPTIONS = -DF_CPU=48000000 -DUSB_SERIAL -DLAYOUT_US_ENGLISH -DUSING_MAKEFILE
