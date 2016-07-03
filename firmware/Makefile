@@ -83,7 +83,7 @@ OBJS := $(C_FILES:.c=.o) $(CPP_FILES:.cpp=.o) $(CORE_OBJ_FILES:.c=.o)
 
 all: $(TARGET).hex
 
-$(TARGET).elf: $(OBJS) teensy3/mk20dx256.ld
+$(TARGET).elf: $(OBJS) teensy3/mkl26z64.ld
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 
 %.hex: %.elf
